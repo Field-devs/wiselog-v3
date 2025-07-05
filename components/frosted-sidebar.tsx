@@ -20,6 +20,7 @@ import {
   ChevronDown,
   Pin,
   PinOff,
+  Database,
 } from "lucide-react"
 
 interface SidebarProps {
@@ -43,13 +44,19 @@ const menuItems: MenuItem[] = [
   },
   {
     id: "teams",
-    label: "Teams",
+    label: "Equipes",
     icon: <Users className="h-5 w-5" />,
     href: "/teams",
   },
   {
+    id: "cadastros",
+    label: "Cadastros",
+    icon: <Database className="h-5 w-5" />,
+    href: "/cadastros",
+  },
+  {
     id: "configuration",
-    label: "Configuration",
+    label: "Configurações",
     icon: <Settings className="h-5 w-5" />,
     href: "/configuration",
     children: [
