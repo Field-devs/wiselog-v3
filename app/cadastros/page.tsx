@@ -1,7 +1,12 @@
-import React from "react"
+"use client"
+
+import React, { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,57 +26,209 @@ import {
   Settings,
   Plus,
   Search,
-  Filter
+  Filter,
+  Edit,
+  Trash2,
+  MoreHorizontal
 } from "lucide-react"
 
 export default function CadastrosPage() {
-  const cadastroModules = [
+  const [activeTab, setActiveTab] = useState("usuarios")
+
+  const tabsData = [
     {
       id: "usuarios",
-      title: "Usuários",
-      description: "Gerenciar usuários do sistema",
-      icon: <Users className="h-8 w-8" />,
+      label: "Usuários",
+      icon: <Users className="h-5 w-5" />,
       count: 127,
-      color: "bg-blue-500",
-      href: "/cadastros/usuarios"
+      data: [
+        { id: 1, nome: "João Silva", email: "joao@empresa.com", perfil: "Administrador", status: "Ativo" },
+        { id: 2, nome: "Maria Santos", email: "maria@empresa.com", perfil: "Operador", status: "Ativo" },
+        { id: 3, nome: "Carlos Lima", email: "carlos@empresa.com", perfil: "Visualizador", status: "Inativo" },
+      ]
     },
     {
       id: "empresas",
-      title: "Empresas",
-      description: "Cadastro de empresas e filiais",
-      icon: <Building2 className="h-8 w-8" />,
+      label: "Empresas",
+      icon: <Building2 className="h-5 w-5" />,
       count: 15,
-      color: "bg-emerald-500",
-      href: "/cadastros/empresas"
+      data: [
+        { id: 1, nome: "Empresa Principal", cnpj: "12.345.678/0001-90", cidade: "São Paulo", status: "Ativa" },
+        { id: 2, nome: "Filial Norte", cnpj: "12.345.678/0002-71", cidade: "Recife", status: "Ativa" },
+        { id: 3, nome: "Filial Sul", cnpj: "12.345.678/0003-52", cidade: "Porto Alegre", status: "Ativa" },
+      ]
     },
     {
       id: "veiculos",
-      title: "Veículos",
-      description: "Cadastro de veículos da frota",
-      icon: <Car className="h-8 w-8" />,
+      label: "Veículos",
+      icon: <Car className="h-5 w-5" />,
       count: 89,
-      color: "bg-purple-500",
-      href: "/cadastros/veiculos"
+      data: [
+        { id: 1, placa: "ABC-1234", modelo: "Honda Civic", ano: "2022", status: "Ativo" },
+        { id: 2, placa: "XYZ-5678", modelo: "Toyota Corolla", ano: "2021", status: "Ativo" },
+        { id: 3, placa: "DEF-9012", modelo: "Volkswagen Gol", ano: "2020", status: "Manutenção" },
+      ]
     },
     {
       id: "locais",
-      title: "Locais",
-      description: "Pontos de interesse e localizações",
-      icon: <MapPin className="h-8 w-8" />,
+      label: "Locais",
+      icon: <MapPin className="h-5 w-5" />,
       count: 234,
-      color: "bg-orange-500",
-      href: "/cadastros/locais"
+      data: [
+        { id: 1, nome: "Sede Principal", endereco: "Av. Paulista, 1000", tipo: "Escritório", status: "Ativo" },
+        { id: 2, nome: "Depósito Norte", endereco: "Rua Industrial, 500", tipo: "Depósito", status: "Ativo" },
+        { id: 3, nome: "Cliente A", endereco: "Rua Comercial, 200", tipo: "Cliente", status: "Ativo" },
+      ]
     },
     {
       id: "configuracoes",
-      title: "Configurações Gerais",
-      description: "Parâmetros e configurações do sistema",
-      icon: <Settings className="h-8 w-8" />,
+      label: "Configurações",
+      icon: <Settings className="h-5 w-5" />,
       count: 45,
-      color: "bg-gray-500",
-      href: "/cadastros/configuracoes"
+      data: [
+        { id: 1, parametro: "Timeout de Sessão", valor: "30 minutos", categoria: "Segurança", status: "Ativo" },
+        { id: 2, parametro: "Intervalo de Atualização", valor: "5 segundos", categoria: "Sistema", status: "Ativo" },
+        { id: 3, parametro: "Limite de Velocidade", valor: "80 km/h", categoria: "Monitoramento", status: "Ativo" },
+      ]
     }
   ]
+
+  const currentTabData = tabsData.find(tab => tab.id === activeTab)
+
+  const renderTableHeaders = (tabId: string) => {
+    switch (tabId) {
+      case "usuarios":
+        return (
+          <>
+            <TableHead className="text-gray-700 dark:text-gray-300">Nome</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Email</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Perfil</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ações</TableHead>
+          </>
+        )
+      case "empresas":
+        return (
+          <>
+            <TableHead className="text-gray-700 dark:text-gray-300">Nome</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">CNPJ</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Cidade</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ações</TableHead>
+          </>
+        )
+      case "veiculos":
+        return (
+          <>
+            <TableHead className="text-gray-700 dark:text-gray-300">Placa</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Modelo</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ano</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ações</TableHead>
+          </>
+        )
+      case "locais":
+        return (
+          <>
+            <TableHead className="text-gray-700 dark:text-gray-300">Nome</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Endereço</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Tipo</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ações</TableHead>
+          </>
+        )
+      case "configuracoes":
+        return (
+          <>
+            <TableHead className="text-gray-700 dark:text-gray-300">Parâmetro</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Valor</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Categoria</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Status</TableHead>
+            <TableHead className="text-gray-700 dark:text-gray-300">Ações</TableHead>
+          </>
+        )
+      default:
+        return null
+    }
+  }
+
+  const renderTableCells = (item: any, tabId: string) => {
+    switch (tabId) {
+      case "usuarios":
+        return (
+          <>
+            <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.nome}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.email}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.perfil}</TableCell>
+            <TableCell>
+              <Badge className={item.status === "Ativo" 
+                ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700"
+                : "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+              }>
+                {item.status}
+              </Badge>
+            </TableCell>
+          </>
+        )
+      case "empresas":
+        return (
+          <>
+            <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.nome}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.cnpj}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.cidade}</TableCell>
+            <TableCell>
+              <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700">
+                {item.status}
+              </Badge>
+            </TableCell>
+          </>
+        )
+      case "veiculos":
+        return (
+          <>
+            <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.placa}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.modelo}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.ano}</TableCell>
+            <TableCell>
+              <Badge className={item.status === "Ativo" 
+                ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700"
+                : "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700"
+              }>
+                {item.status}
+              </Badge>
+            </TableCell>
+          </>
+        )
+      case "locais":
+        return (
+          <>
+            <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.nome}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.endereco}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.tipo}</TableCell>
+            <TableCell>
+              <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700">
+                {item.status}
+              </Badge>
+            </TableCell>
+          </>
+        )
+      case "configuracoes":
+        return (
+          <>
+            <TableCell className="font-medium text-gray-900 dark:text-gray-100">{item.parametro}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.valor}</TableCell>
+            <TableCell className="text-gray-900 dark:text-gray-100">{item.categoria}</TableCell>
+            <TableCell>
+              <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700">
+                {item.status}
+              </Badge>
+            </TableCell>
+          </>
+        )
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -109,99 +266,145 @@ export default function CadastrosPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Main Content with Tabs */}
       <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <Plus className="h-5 w-5 text-blue-500" />
-            Ações Rápidas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-              <Plus className="mr-2 h-4 w-4" />
-              Novo Usuário
-            </Button>
-            <Button variant="outline" className="border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50">
-              <Search className="mr-2 h-4 w-4" />
-              Buscar Registros
-            </Button>
-            <Button variant="outline" className="border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtros Avançados
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cadastroModules.map((module) => (
-          <Card 
-            key={module.id}
-            className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl hover:-translate-y-1"
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className={`p-3 rounded-xl ${module.color} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  {module.icon}
-                </div>
-                <Badge 
-                  variant="secondary" 
-                  className="bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <TabsList className="h-auto bg-transparent p-0 space-x-8">
+              {tabsData.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex items-center gap-3 px-0 py-4 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent rounded-none text-gray-600 dark:text-gray-400 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
                 >
-                  {module.count}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <CardTitle className="text-xl text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {module.title}
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400 mt-1">
-                  {module.description}
-                </CardDescription>
-              </div>
-              
-              <div className="pt-2">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20"
-                >
-                  Acessar módulo
-                  <span className="ml-auto group-hover:translate-x-1 transition-transform duration-200">→</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Statistics Summary */}
-      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Resumo dos Cadastros</CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-400">
-            Visão geral dos registros no sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-            {cadastroModules.map((module) => (
-              <div key={module.id} className="text-center space-y-2">
-                <div className={`w-12 h-12 mx-auto rounded-lg ${module.color} text-white flex items-center justify-center`}>
-                  {React.cloneElement(module.icon, { className: "h-6 w-6" })}
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{module.count}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{module.title}</div>
-                </div>
-              </div>
-            ))}
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700 rounded-full min-w-[24px] h-6 flex items-center justify-center px-2"
+                  >
+                    {tab.count}
+                  </Badge>
+                </TabsTrigger>
+              ))}
+            </TabsList>
           </div>
-        </CardContent>
+
+          {tabsData.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className="mt-6">
+              <div className="space-y-4">
+                {/* Action Bar */}
+                <div className="flex gap-3 items-center justify-between p-4 bg-gray-25 rounded-lg border border-gray-100 dark:bg-gray-800/50 dark:border-gray-700">
+                  <div className="flex gap-3 items-center">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                      <Input
+                        placeholder={`Buscar ${tab.label.toLowerCase()}...`}
+                        className="pl-10 w-64 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-gray-200 text-gray-600 hover:bg-gray-50 bg-transparent dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filtros
+                    </Button>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-blue-500 hover:bg-blue-600 text-white border-0 dark:bg-blue-600 dark:hover:bg-blue-700"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar {tab.label.slice(0, -1)}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="border rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-gray-200 dark:border-gray-700">
+                        {renderTableHeaders(tab.id)}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {tab.data.map((item) => (
+                        <TableRow
+                          key={item.id}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-gray-200 dark:border-gray-700"
+                        >
+                          {renderTableCells(item, tab.id)}
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Mostrando {tab.data.length} de {tab.count} registros
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled
+                      className="border-gray-200 text-gray-400 bg-transparent dark:border-gray-600 dark:text-gray-500"
+                    >
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-blue-200 text-blue-600 bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:bg-blue-900/30"
+                    >
+                      1
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled
+                      className="border-gray-200 text-gray-400 bg-transparent dark:border-gray-600 dark:text-gray-500"
+                    >
+                      Próximo
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </Card>
     </div>
   )
