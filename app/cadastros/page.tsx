@@ -668,7 +668,7 @@ export default function CadastrosPage() {
 
   const renderTableCells = (item: any, tabId: string) => {
     const getStatusBadge = (status: string) => {
-      const statusLower = status.toLowerCase()
+      const statusLower = status?.toLowerCase() || ""
       if (statusLower.includes("ativ")) {
         return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700"
       } else if (statusLower.includes("manut") || statusLower.includes("análise")) {
