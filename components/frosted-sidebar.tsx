@@ -7,21 +7,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Menu,
-  X,
-  Home,
-  Users,
-  Settings,
-  User,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Pin,
-  PinOff,
-  Database,
-} from "lucide-react"
+import * as LucideIcons from "lucide-react"
 
 interface SidebarProps {
   className?: string
@@ -39,37 +25,37 @@ const menuItems: MenuItem[] = [
   {
     id: "home",
     label: "Home",
-    icon: <Home className="h-5 w-5" />,
+    icon: <LucideIcons.Home className="h-5 w-5" />,
     href: "/",
   },
   {
     id: "teams",
     label: "Equipes",
-    icon: <Users className="h-5 w-5" />,
+    icon: <LucideIcons.Users className="h-5 w-5" />,
     href: "/teams",
   },
   {
     id: "cadastros",
     label: "Cadastros",
-    icon: <Database className="h-5 w-5" />,
+    icon: <LucideIcons.Database className="h-5 w-5" />,
     href: "/cadastros",
   },
   {
     id: "configuration",
     label: "Configurações",
-    icon: <Settings className="h-5 w-5" />,
+    icon: <LucideIcons.Settings className="h-5 w-5" />,
     href: "/configuration",
     children: [
       {
         id: "profile",
         label: "My Profile",
-        icon: <User className="h-4 w-4" />,
+        icon: <LucideIcons.User className="h-4 w-4" />,
         href: "/profile",
       },
       {
         id: "logout",
         label: "Logout",
-        icon: <LogOut className="h-4 w-4" />,
+        icon: <LucideIcons.LogOut className="h-4 w-4" />,
         href: "/logout",
       },
     ],
@@ -231,7 +217,7 @@ export function FrostedSidebar({ className = "" }: SidebarProps) {
               {!showCollapsed && (
                 <>
                   <span className="font-medium truncate flex-1">{item.label}</span>
-                  <ChevronDown
+                  <LucideIcons.ChevronDown
                     className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                   />
                 </>
@@ -303,7 +289,7 @@ export function FrostedSidebar({ className = "" }: SidebarProps) {
         className="fixed top-4 left-4 z-50 lg:hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:bg-white dark:hover:bg-gray-800"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
       >
-        {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {isMobileOpen ? <LucideIcons.X className="h-5 w-5" /> : <LucideIcons.Menu className="h-5 w-5" />}
       </Button>
 
       {/* Proximity Indicator */}
@@ -376,7 +362,7 @@ export function FrostedSidebar({ className = "" }: SidebarProps) {
                   } backdrop-blur-sm`}
                   title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
                 >
-                  {isPinned ? <Pin className="h-4 w-4" /> : <PinOff className="h-4 w-4" />}
+                  {isPinned ? <LucideIcons.Pin className="h-4 w-4" /> : <LucideIcons.PinOff className="h-4 w-4" />}
                 </Button>
 
                 {/* Collapse Button */}
@@ -386,7 +372,7 @@ export function FrostedSidebar({ className = "" }: SidebarProps) {
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-800/40 backdrop-blur-sm rounded-xl"
                 >
-                  {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+                  {isCollapsed ? <LucideIcons.ChevronRight className="h-5 w-5" /> : <LucideIcons.ChevronLeft className="h-5 w-5" />}
                 </Button>
               </div>
             )}
