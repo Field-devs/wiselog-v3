@@ -341,6 +341,7 @@ export default function CadastrosPage() {
 
               <Button variant="outline" className="bg-white/50 dark:bg-gray-800/50">
                 <Settings className="h-4 w-4" />
+                Configurações
               </Button>
             </div>
           </div>
