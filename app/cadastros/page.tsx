@@ -90,6 +90,7 @@ export default function CadastrosPage() {
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   // Dados mock
   const [users, setUsers] = useState<User[]>([
@@ -339,9 +340,12 @@ export default function CadastrosPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="outline" className="bg-white/50 dark:bg-gray-800/50">
+              <Button 
+                variant="outline" 
+                className="bg-white/50 dark:bg-gray-800/50"
+                onClick={() => setIsSettingsOpen(true)}
+              >
                 <Settings className="h-4 w-4" />
-                Configurações
               </Button>
             </div>
           </div>
@@ -993,6 +997,90 @@ export default function CadastrosPage() {
             <Button onClick={handleCreateLocation} className="bg-blue-500 hover:bg-blue-600">
               <Plus className="mr-2 h-4 w-4" />
               Criar Local
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Configurações */}
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-blue-500" />
+              Configurações do Sistema
+            </DialogTitle>
+            <DialogDescription>
+              Configure as opções do sistema de cadastros.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium">Notificações</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Receber notificações de novos cadastros
+                  </p>
+                </div>
+                <Checkbox defaultChecked />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium">Auto-backup</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Backup automático dos dados
+                  </p>
+                </div>
+                <Checkbox defaultChecked />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium">Validação rigorosa</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Validação mais rigorosa nos formulários
+                  </p>
+                </div>
+                <Checkbox />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Tema padrão</Label>
+                <Select defaultValue="auto">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Claro</SelectItem>
+                    <SelectItem value="dark">Escuro</SelectItem>
+                    <SelectItem value="auto">Automático</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Idioma</Label>
+                <Select defaultValue="pt-br">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pt-br">Português (Brasil)</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={() => setIsSettingsOpen(false)} className="bg-blue-500 hover:bg-blue-600">
+              Salvar Configurações
             </Button>
           </DialogFooter>
         </DialogContent>
