@@ -282,7 +282,9 @@ export default function CadastrosPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Content */}
