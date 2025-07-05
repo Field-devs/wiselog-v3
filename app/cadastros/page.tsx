@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -58,7 +59,11 @@ import {
   Download,
   Upload,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Settings,
+  RotateCcw,
 } from "lucide-react"
 
 export default function CadastrosPage() {
@@ -67,6 +72,33 @@ export default function CadastrosPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
+  const [visibleCadastros, setVisibleCadastros] = useState<string[]>(
+    ["veiculos", "unidades", "clientes", "contratos", "produtos", "estoques", "ocorrencias", "itens", "prestadores", "tarifas", "despesasExtras", "taxas", "tarifasUnidade", "tarifasServico", "setoresTarifarios", "motivos", "grupos", "habilidades", "categorias", "avaliacoes", "formularios", "acordosCompra", "segmentosContabeis", "relacionamentoComercial"]
+  )
+
+  // Função para alternar visibilidade de um cadastro
+  const toggleCadastroVisibility = (cadastroId: string) => {
+    setVisibleCadastros(prev => 
+      prev.includes(cadastroId) 
+        ? prev.filter(id => id !== cadastroId)
+        : [...prev, cadastroId]
+    )
+  }
+
+  // Função para mostrar todos os cadastros
+  const showAllCadastros = () => {
+    setVisibleCadastros(["veiculos", "unidades", "clientes", "contratos", "produtos", "estoques", "ocorrencias", "itens", "prestadores", "tarifas", "despesasExtras", "taxas", "tarifasUnidade", "tarifasServico", "setoresTarifarios", "motivos", "grupos", "habilidades", "categorias", "avaliacoes", "formularios", "acordosCompra", "segmentosContabeis", "relacionamentoComercial"])
+  }
+
+  // Função para ocultar todos os cadastros
+  const hideAllCadastros = () => {
+    setVisibleCadastros([])
+  }
+
+  // Função para resetar para padrão (todos visíveis)
+  const resetToDefault = () => {
+    setVisibleCadastros(["veiculos", "unidades", "clientes", "contratos", "produtos", "estoques", "ocorrencias", "itens", "prestadores", "tarifas", "despesasExtras", "taxas", "tarifasUnidade", "tarifasServico", "setoresTarifarios", "motivos", "grupos", "habilidades", "categorias", "avaliacoes", "formularios", "acordosCompra", "segmentosContabeis", "relacionamentoComercial"])
+  }
 
   const tabsData = [
     {
@@ -383,7 +415,12 @@ export default function CadastrosPage() {
     }
   ]
 
-  const currentTabData = tabsData.find(tab => tab.id === activeTab)
+  // Filtrar cadastros visíveis
+  const filteredTabsData = tabsData.filter(tab => 
+    visibleCadastros.includes(tab.id)
+  )
+
+  const currentTabData = filteredTabsData.find(tab => tab.id === activeTab)
 
   const filteredData = currentTabData?.data.filter(item => {
     const matchesSearch = searchTerm === "" || Object.values(item).some(value => 
@@ -995,7 +1032,104 @@ export default function CadastrosPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          {/* Seletor de Visibilidade de Cadastros */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Configurar Cadastros
+                <Badge 
+                  variant="secondary" 
+                  className="ml-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                >
+                  {visibleCadastros.length}/24
+                </Badge>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+              <DropdownMenuLabel className="text-gray-900 dark:text-gray-100 font-semibold">
+                Selecionar Cadastros Visíveis
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+              
+              {/* Ações rápidas */}
+              <div className="px-2 py-2 space-y-1">
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={showAllCadastros}
+                    className="flex-1 h-8 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <Eye className="mr-1 h-3 w-3" />
+                    Mostrar Todos
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={hideAllCadastros}
+                    className="flex-1 h-8 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <EyeOff className="mr-1 h-3 w-3" />
+                    Ocultar Todos
+                  </Button>
+                </div>
+              </div>
+              
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+              
+              {/* Lista de cadastros */}
+              <div className="max-h-64 overflow-y-auto">
+                {tabsData.map((cadastro) => (
+                  <DropdownMenuItem
+                    key={cadastro.id}
+                    className="flex items-center space-x-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600"
+                    onSelect={(e) => e.preventDefault()}
+                    onClick={() => toggleCadastroVisibility(cadastro.id)}
+                  >
+                    <Checkbox
+                      checked={visibleCadastros.includes(cadastro.id)}
+                      className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                    />
+                    <span className="text-lg">{cadastro.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-sm ${
+                        visibleCadastros.includes(cadastro.id) 
+                          ? "text-gray-900 dark:text-gray-100" 
+                          : "text-gray-500 dark:text-gray-400"
+                      }`}>
+                        {cadastro.label}
+                      </span>
+                    </div>
+                    {visibleCadastros.includes(cadastro.id) ? (
+                      <Eye className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </div>
+              
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+              
+              {/* Opção de reset */}
+              <DropdownMenuItem
+                onClick={resetToDefault}
+                className="flex items-center space-x-2 px-3 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer"
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span className="text-sm font-medium">Restaurar Padrão</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Content with Tabs */}
@@ -1007,7 +1141,7 @@ export default function CadastrosPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
               <TabsList className="h-auto bg-transparent p-0 flex flex-wrap gap-4">
-                {tabsData.map((tab) => (
+                {filteredTabsData.map((tab) => (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
@@ -1026,7 +1160,7 @@ export default function CadastrosPage() {
               </TabsList>
             </div>
 
-            {tabsData.map((tab) => (
+            {filteredTabsData.map((tab) => (
               <TabsContent key={tab.id} value={tab.id} className="mt-0">
                 <div className="space-y-4">
                   {/* Action Bar */}
