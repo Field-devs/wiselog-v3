@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Breadcrumb,
@@ -56,14 +56,13 @@ import {
   UserPlus, 
   Star, 
   ClipboardList, 
-  Database,
-  ChevronDown,
-  ChevronRight
+  Database
 } from "lucide-react"
 
 export default function CadastrosPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [activeTab, setActiveTab] = useState("all")
+  const [activeGroup, setActiveGroup] = useState("operacional")
+  const [activeItem, setActiveItem] = useState("veiculos")
 
   // Define all cadastros organized by groups
   const cadastroGroups = {
@@ -136,23 +135,20 @@ export default function CadastrosPage() {
     }
   }
 
-  // Filter cadastros based on search term
-  const filteredCadastros = Object.entries(cadastroGroups).reduce((acc, [groupKey, group]) => {
-    if (!searchTerm) return true
-    
-    const groupMatches = group.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const itemMatches = group.items.some(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    
-    if (groupMatches || itemMatches) {
-      acc[groupKey] = group
+  // Get current group and item
+  const currentGroup = cadastroGroups[activeGroup as keyof typeof cadastroGroups]
+  const currentItem = currentGroup?.items.find(item => item.id === activeItem)
+
+  // Handle group change
+  const handleGroupChange = (groupKey: string) => {
+    setActiveGroup(groupKey)
+    // Set first item of the group as active
+    const group = cadastroGroups[groupKey as keyof typeof cadastroGroups]
+    if (group && group.items.length > 0) {
+      setActiveItem(group.items[0].id)
     }
-    
-    return acc
-  }, {} as typeof cadastroGroups)
-  
+  }
+
   // Get badge color class based on group
   const getBadgeColorClass = (color: string) => {
     const colors = {
@@ -164,7 +160,7 @@ export default function CadastrosPage() {
       gray: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-700"
     }
     return colors[color as keyof typeof colors] || colors.gray
-  })
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -204,202 +200,213 @@ export default function CadastrosPage() {
         </Button>
       </div>
 
-      {/* Groups Navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-              <Database className="h-5 w-5 text-blue-500" />
-              Cadastros
-            </CardTitle>
-            <CardDescription>
-              Gerencie todos os cadastros do sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            {/* Main Tabs - Groups */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
-              <TabsList className="h-auto bg-transparent p-0 px-6 space-x-8">
-                <TabsTrigger
-                  value="all"
-                  className="flex items-center gap-3 px-0 py-4 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent rounded-none text-gray-600 dark:text-gray-400 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
-                >
-                  <Database className="h-5 w-5" />
-                  <span className="font-medium">Todos</span>
-                </TabsTrigger>
-                
-                {Object.entries(cadastroGroups).map(([key, group]) => (
-                  <TabsTrigger
-                    key={key}
-                    value={key}
-                    className="flex items-center gap-3 px-0 py-4 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent rounded-none text-gray-600 dark:text-gray-400 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
-                  >
-                    {group.icon}
-                    <span className="font-medium">{group.name}</span>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs ${getBadgeColorClass(group.color)}`}
-                    >
-                      {group.items.length}
-                    </Badge>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-            
-            {/* Tab Contents */}
-            <div className="p-6">
-              {/* All Cadastros Tab */}
-              <TabsContent value="all" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {Object.entries(filteredCadastros).flatMap(([groupKey, group]) =>
-                    group.items.map((item) => (
-                      <CadastroItem 
-                        key={`${groupKey}-${item.id}`} 
-                        item={item} 
-                        groupName={group.name} 
-                        groupColor={group.color} 
-                      />
-                    ))
-                  )}
-                </div>
-                
-                {/* No Results State */}
-                {searchTerm && Object.keys(filteredCadastros).length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                      <Search className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">
-                      Nenhum resultado encontrado
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-                      Não encontramos nenhum cadastro com os critérios de busca "{searchTerm}". Tente ajustar sua pesquisa.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              {/* Group Tabs */}
+      {/* Two-Level Navigation */}
+      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+            <Database className="h-5 w-5 text-blue-500" />
+            Cadastros
+          </CardTitle>
+          <CardDescription>
+            Gerencie todos os cadastros do sistema
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {/* First Level - Groups */}
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="flex overflow-x-auto px-6">
               {Object.entries(cadastroGroups).map(([key, group]) => (
-                <TabsContent key={key} value={key} className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {group.items
-                      .filter(item => 
-                        !searchTerm || 
-                        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        item.description.toLowerCase().includes(searchTerm.toLowerCase())
-                      )
-                      .map((item) => (
-                        <CadastroItem 
-                          key={item.id} 
-                          item={item} 
-                          groupName={group.name} 
-                          groupColor={group.color} 
-                        />
-                      ))
-                    }
-                  </div>
-                  
-                  {/* Empty Search Results */}
-                  {searchTerm && group.items.filter(item => 
-                    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    item.description.toLowerCase().includes(searchTerm.toLowerCase())
-                  ).length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-12">
-                      <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                        <Search className="h-12 w-12 text-gray-400" />
-                      </div>
-                      <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">
-                        Nenhum resultado encontrado
-                      </h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-                        Não encontramos nenhum cadastro com os critérios de busca "{searchTerm}" neste grupo. Tente ajustar sua pesquisa.
-                      </p>
-                    </div>
-                  )}
-                </TabsContent>
+                <button
+                  key={key}
+                  onClick={() => handleGroupChange(key)}
+                  className={`flex items-center gap-3 px-0 py-4 mr-8 bg-transparent border-0 border-b-2 border-transparent transition-all duration-200 whitespace-nowrap ${
+                    activeGroup === key
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                  }`}
+                >
+                  {group.icon}
+                  <span className="font-medium">{group.name}</span>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${getBadgeColorClass(group.color)}`}
+                  >
+                    {group.items.length}
+                  </Badge>
+                </button>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </Tabs>
-    </div>
-  )
-}
-
-// Cadastro Item Component
-interface CadastroItemProps {
-  item: {
-    id: string
-    name: string
-    icon: React.ReactNode
-    description: string
-  }
-  groupName: string
-  groupColor: string
-}
-
-function CadastroItem({ item, groupName, groupColor }: CadastroItemProps) {
-  const getBadgeClass = (color: string) => {
-    const colors = {
-      blue: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700",
-      emerald: "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700",
-      purple: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700",
-      orange: "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700",
-      pink: "bg-pink-100 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-700",
-      gray: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-700"
-    }
-    return colors[color as keyof typeof colors] || colors.gray
-  }
-  
-  return (
-    <Card className="group cursor-pointer transition-all duration-200 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-              {item.icon}
-            </div>
-            <CardTitle className="text-base">{item.name}</CardTitle>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Plus className="mr-2 h-4 w-4" />
-                Novo
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Search className="mr-2 h-4 w-4" />
-                Visualizar
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Configurar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <CardDescription className="text-sm mb-3">
-          {item.description}
-        </CardDescription>
-        <div className="flex justify-between items-center">
-          <Badge variant="outline" className={`text-xs ${getBadgeClass(groupColor)}`}>
-            {groupName}
-          </Badge>
-          <Button variant="ghost" size="sm" className="h-8 px-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-            Acessar
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          
+          {/* Second Level - Items */}
+          {currentGroup && (
+            <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+              <div className="flex overflow-x-auto px-6">
+                {currentGroup.items.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveItem(item.id)}
+                    className={`flex items-center gap-2 px-0 py-3 mr-6 bg-transparent border-0 border-b-2 border-transparent transition-all duration-200 whitespace-nowrap ${
+                      activeItem === item.id
+                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                    }`}
+                  >
+                    <span className="text-sm">{item.icon}</span>
+                    <span className="text-sm font-medium">{item.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Content Area */}
+          <div className="p-6">
+            {currentItem ? (
+              <div className="space-y-6">
+                {/* Current Item Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                      {currentItem.icon}
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {currentItem.name}
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {currentItem.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <MoreHorizontal className="h-4 w-4 mr-2" />
+                          Ações
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Novo {currentItem.name.slice(0, -1)}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Search className="mr-2 h-4 w-4" />
+                          Visualizar Lista
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Configurações
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Novo {currentItem.name.slice(0, -1)}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Content Placeholder */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Quick Actions */}
+                  <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Plus className="h-5 w-5 text-green-600" />
+                        Adicionar Novo
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Criar um novo registro de {currentItem.name.toLowerCase()}
+                      </p>
+                      <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+                        Criar Novo
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* View All */}
+                  <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Search className="h-5 w-5 text-blue-600" />
+                        Visualizar Todos
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Ver lista completa de {currentItem.name.toLowerCase()}
+                      </p>
+                      <Button variant="outline" className="w-full">
+                        Ver Lista
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Settings */}
+                  <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Settings className="h-5 w-5 text-gray-600" />
+                        Configurações
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Configurar campos e validações
+                      </p>
+                      <Button variant="outline" className="w-full">
+                        Configurar
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Recent Activity */}
+                <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Atividade Recente</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                          <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              Novo registro adicionado
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              há {i} hora{i > 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                  <Database className="h-12 w-12 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  Selecione um cadastro
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
+                  Escolha um grupo e um item de cadastro para começar a trabalhar.
+                </p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
