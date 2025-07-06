@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge" 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -29,7 +29,7 @@ import {
   Building, 
   MapPin, 
   Settings, 
-  Plus, 
+  Plus,
   Search, 
   Filter,
   MoreHorizontal,
@@ -37,8 +37,22 @@ import {
   Trash2,
   Eye,
   ChevronDown,
-  UserPlus,
-  Zap
+  UserPlus, 
+  Zap,
+  Package,
+  Truck,
+  FileText,
+  Briefcase,
+  Box,
+  DollarSign,
+  Clipboard,
+  Tag,
+  Star,
+  FileCheck,
+  ShoppingBag,
+  BarChart,
+  Layers,
+  Award
 } from "lucide-react"
 
 // Tipos de dados
@@ -378,6 +392,177 @@ export default function CadastrosPage() {
               })}
               </div>
               
+              {/* Dropdown para outros cadastros */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="ml-auto bg-white/50 dark:bg-gray-800/50 border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  >
+                    Outros Cadastros
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Truck className="mr-2 h-4 w-4 text-blue-500" />
+                    Veículos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Building className="mr-2 h-4 w-4 text-purple-500" />
+                    Unidades
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Briefcase className="mr-2 h-4 w-4 text-emerald-500" />
+                    Clientes
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <FileText className="mr-2 h-4 w-4 text-amber-500" />
+                    Contratos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Package className="mr-2 h-4 w-4 text-indigo-500" />
+                    Produtos
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Box className="mr-2 h-4 w-4 text-cyan-500" />
+                    Estoques
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Clipboard className="mr-2 h-4 w-4 text-rose-500" />
+                    Ocorrências
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Tag className="mr-2 h-4 w-4 text-orange-500" />
+                    Itens
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Users className="mr-2 h-4 w-4 text-teal-500" />
+                    Prestadores
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <DollarSign className="mr-2 h-4 w-4 text-green-500" />
+                    Tarifas
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4 text-red-500" />
+                    Despesas Extras
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <BarChart className="mr-2 h-4 w-4 text-blue-500" />
+                    Taxas
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <MapPin className="mr-2 h-4 w-4 text-violet-500" />
+                    Setores Tarifários
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <FileCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                    Motivos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Users className="mr-2 h-4 w-4 text-amber-500" />
+                    Grupos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Zap className="mr-2 h-4 w-4 text-blue-500" />
+                    Habilidades
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Layers className="mr-2 h-4 w-4 text-indigo-500" />
+                    Categorias
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Star className="mr-2 h-4 w-4 text-yellow-500" />
+                    Avaliações
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <FileText className="mr-2 h-4 w-4 text-teal-500" />
+                    Formulários
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4 text-purple-500" />
+                    Acordos de Compra
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <BarChart className="mr-2 h-4 w-4 text-gray-500" />
+                    Segmentos Contábeis
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setIsQuickCreateOpen(false)}
+                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
+                  >
+                    <Award className="mr-2 h-4 w-4 text-orange-500" />
+                    Relacionamento Comercial
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {/* Quick Access to All Cadastros */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Cadastros:</span>
