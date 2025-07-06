@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -25,362 +25,49 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   Home, 
-  Search, 
-  Plus, 
-  MoreHorizontal, 
-  Car, 
-  Building2, 
-  Package, 
-  MapPin, 
-  AlertTriangle, 
-  DollarSign, 
-  Briefcase, 
-  Users, 
-  ShoppingBag, 
-  Settings, 
-  FileText, 
+  Search,
+  Plus,
   Truck, 
-  Warehouse, 
-  Route, 
-  HelpCircle, 
-  Tag, 
-  Building, 
-  Receipt, 
-  CreditCard, 
-  Map, 
-  PlusCircle, 
-  Handshake, 
-  UserCheck, 
-  Heart, 
-  Box, 
-  ShoppingCart, 
-  UserPlus, 
-  Star, 
-  ClipboardList, 
+  DollarSign,
+  Briefcase,
+  Users,
+  ShoppingBag,
+  Settings,
   Database
 } from "lucide-react"
+import Link from "next/link"
+import { getAllCadastroModules, getCadastroGroups } from "@/lib/cadastro-modules"
 
 export default function CadastrosPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("all")
-  const [expandedGroup, setExpandedGroup] = useState<string | null>("operacional")
-  const [activeItem, setActiveItem] = useState<string | null>("veiculos")
-  const [moduleData, setModuleData] = useState<any[]>([])
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
 
-  // Define cadastros with their groups and fields
-  const cadastroGroups: Record<string, any> = {
-    operacional: {
-      name: "Operacional",
-      icon: <Truck className="h-5 w-5" />,
-      color: "blue",
-      items: [
-        { 
-          id: "veiculos", 
-          name: "Veículos", 
-          icon: <Car className="h-5 w-5" />, 
-          description: "Cadastro de veículos da frota",
-          fields: ["Nome", "Tipo", "Placa", "Motorista", "Peso", "Volume"],
-          relationships: ["Tarifas", "Unidades"]
-        },
-        { 
-          id: "unidades", 
-          name: "Unidades", 
-          icon: <Building2 className="h-5 w-5" />, 
-          description: "Unidades operacionais",
-          fields: ["Nome", "Empresa", "Intercompanhia"],
-          relationships: []
-        },
-        { 
-          id: "estoques", 
-          name: "Estoques", 
-          icon: <Package className="h-5 w-5" />, 
-          description: "Gestão de estoques",
-          fields: ["Produto", "Quantidade", "Local"],
-          relationships: ["Produtos"]
-        },
-        { 
-          id: "viagens", 
-          name: "Viagens", 
-          icon: <Route className="h-5 w-5" />, 
-          description: "Cadastro de viagens",
-          fields: ["Origem", "Destino", "Data", "Veículo", "Motorista"],
-          relationships: ["Veículos", "Ocorrências"]
-        },
-        { 
-          id: "motivos", 
-          name: "Motivos", 
-          icon: <HelpCircle className="h-5 w-5" />, 
-          description: "Motivos operacionais",
-          fields: ["Nome", "Unidade", "Referência", "Status"],
-          relationships: ["Unidades"]
-        },
-        { 
-          id: "ocorrencias", 
-          name: "Ocorrências", 
-          icon: <AlertTriangle className="h-5 w-5" />, 
-          description: "Cadastro de ocorrências",
-          fields: ["Descrição", "Contrato vinculado", "Tipo de tarefa"],
-          relationships: ["Contratos"]
-        },
-      ]
-    },
-    financeiro: {
-      name: "Financeiro",
-      icon: <DollarSign className="h-5 w-5" />,
-      color: "emerald",
-      items: [
-        { 
-          id: "tarifas", 
-          name: "Tarifas", 
-          icon: <DollarSign className="h-5 w-5" />, 
-          description: "Tarifas gerais",
-          fields: ["Prestador", "Tipo contrato", "Diárias", "Km", "HE/HA (comum e especial)"],
-          relationships: ["Prestadores"]
-        },
-        { 
-          id: "tarifas-unidade", 
-          name: "Tarifas por Unidade", 
-          icon: <Building className="h-5 w-5" />, 
-          description: "Tarifas específicas por unidade",
-          fields: ["Nome", "Urbano/Viagem planejada e não planejada"],
-          relationships: ["Unidades", "Tarifas"]
-        },
-        { 
-          id: "tarifas-servico", 
-          name: "Tarifas por Serviço", 
-          icon: <Tag className="h-5 w-5" />, 
-          description: "Tarifas específicas por serviço",
-          fields: ["Nome", "Valor hora", "Período", "Dispêndio"],
-          relationships: ["Tarifas"]
-        },
-        { 
-          id: "taxas", 
-          name: "Taxas", 
-          icon: <Receipt className="h-5 w-5" />, 
-          description: "Taxas e impostos",
-          fields: ["Nome", "Valores por tipo de transporte", "Status"],
-          relationships: []
-        },
-        { 
-          id: "setores-tarifarios", 
-          name: "Setores Tarifários", 
-          icon: <Map className="h-5 w-5" />, 
-          description: "Setores para tarifação",
-          fields: ["Código", "Nome", "Valores por evento/diária"],
-          relationships: ["Tarifas"]
-        },
-        { 
-          id: "despesas-extras", 
-          name: "Despesas Extras", 
-          icon: <CreditCard className="h-5 w-5" />, 
-          description: "Cadastro de despesas extras",
-          fields: ["Unidade", "Nome", "Status"],
-          relationships: ["Unidades"]
-        },
-        { 
-          id: "acordos-compra", 
-          name: "Acordos de Compra", 
-          icon: <Handshake className="h-5 w-5" />, 
-          description: "Acordos comerciais de compra",
-          fields: ["Tipo", "Fornecedor", "Datas", "Itens"],
-          relationships: ["Prestadores", "Itens"]
-        },
-        { 
-          id: "categorias", 
-          name: "Categorias", 
-          icon: <Tag className="h-5 w-5" />, 
-          description: "Categorias financeiras",
-          fields: ["Nome", "Código externo", "Conta contábil", "Estimativa de custo"],
-          relationships: []
-        },
-        { 
-          id: "segmentos-contabeis", 
-          name: "Segmentos Contábeis", 
-          icon: <FileText className="h-5 w-5" />, 
-          description: "Segmentos para contabilidade",
-          fields: ["Tipo", "Valor", "Descrição"],
-          relationships: ["Categorias"]
-        },
-      ]
-    },
-    comercial: {
-      name: "Comercial",
-      icon: <Briefcase className="h-5 w-5" />,
-      color: "purple",
-      items: [
-        { 
-          id: "clientes", 
-          name: "Clientes", 
-          icon: <Users className="h-5 w-5" />, 
-          description: "Cadastro de clientes",
-          fields: ["Nome", "CNPJ", "Endereço", "Telefone", "Contrato", "Janelas de entrega"],
-          relationships: ["Contratos", "Projetos", "Produtos"]
-        },
-        { 
-          id: "contratos", 
-          name: "Contratos", 
-          icon: <FileText className="h-5 w-5" />, 
-          description: "Gestão de contratos",
-          fields: ["Nome", "Unidade", "Usuários", "Inventário (on/off)", "Retornáveis (on/off)"],
-          relationships: ["Unidades", "Clientes"]
-        },
-        { 
-          id: "prestadores", 
-          name: "Prestadores", 
-          icon: <UserCheck className="h-5 w-5" />, 
-          description: "Cadastro de prestadores",
-          fields: ["Nome", "Unidade", "Email", "Avaliação com estrelas"],
-          relationships: ["Unidades", "Avaliações"]
-        },
-        { 
-          id: "relacionamento", 
-          name: "Relacionamento", 
-          icon: <Heart className="h-5 w-5" />, 
-          description: "Gestão de relacionamento",
-          fields: ["Nome", "Código", "CNPJ", "Contatos", "Endereços", "Bancos"],
-          relationships: ["Clientes", "Prestadores"]
-        },
-      ]
-    },
-    produtos: {
-      name: "Produtos",
-      icon: <ShoppingBag className="h-5 w-5" />,
-      color: "orange",
-      items: [
-        { 
-          id: "itens", 
-          name: "Itens", 
-          icon: <Box className="h-5 w-5" />, 
-          description: "Cadastro de itens",
-          fields: ["Nome", "Cliente", "QRCode", "Localização", "Descrição", "Valor", "Status Oracle"],
-          relationships: ["Clientes", "Produtos"]
-        },
-        { 
-          id: "produtos", 
-          name: "Produtos", 
-          icon: <ShoppingCart className="h-5 w-5" />, 
-          description: "Cadastro de produtos",
-          fields: ["Nome", "SKU", "Unidade de medida", "Status"],
-          relationships: ["Estoques", "Clientes"]
-        },
-      ]
-    },
-    pessoas: {
-      name: "Pessoas",
-      icon: <Users className="h-5 w-5" />,
-      color: "pink",
-      items: [
-        { 
-          id: "grupos", 
-          name: "Grupos", 
-          icon: <UserPlus className="h-5 w-5" />, 
-          description: "Grupos de pessoas",
-          fields: ["Nome do grupo", "Líder", "Membros"],
-          relationships: ["Habilidades"]
-        },
-        { 
-          id: "habilidades", 
-          name: "Habilidades", 
-          icon: <Star className="h-5 w-5" />, 
-          description: "Cadastro de habilidades",
-          fields: ["Nome", "Descrição"],
-          relationships: ["Grupos"]
-        },
-        { 
-          id: "avaliacoes", 
-          name: "Avaliações", 
-          icon: <ClipboardList className="h-5 w-5" />, 
-          description: "Avaliações de desempenho",
-          fields: ["Descrição", "Avaliação em estrelas"],
-          relationships: ["Prestadores", "Grupos"]
-        },
-      ]
-    },
-    configuracoes: {
-      name: "Configurações",
-      icon: <Settings className="h-5 w-5" />,
-      color: "gray",
-      items: [
-        { 
-          id: "formularios", 
-          name: "Formulários", 
-          icon: <Settings className="h-5 w-5" />, 
-          description: "Configuração de formulários",
-          fields: ["Nome", "Tipo de cadastro vinculado"],
-          relationships: []
-        },
-      ]
-    }
-  }
-
-  // Generate mock data for the selected module
-  useEffect(() => {
-    if (activeItem) {
-      // Find the current item
-      let currentItem = null;
-      for (const group of Object.values(cadastroGroups)) {
-        const found = group.items.find((item: any) => item.id === activeItem);
-        if (found) {
-          currentItem = found;
-          break;
-        }
-      }
-      
-      if (currentItem) {
-        // Generate 5 mock records
-        const mockData = Array.from({ length: 5 }, (_, i) => {
-          const record: Record<string, any> = { id: i + 1 };
-          currentItem.fields.forEach((field: string) => {
-            if (field.includes("Nome")) record[field] = `${field} ${i + 1}`;
-            else if (field.includes("Código")) record[field] = `COD-${1000 + i}`;
-            else if (field.includes("CNPJ")) record[field] = `${12345678 + i}/0001-${10 + i}`;
-            else if (field.includes("Valor")) record[field] = `R$ ${(100 * (i + 1)).toFixed(2)}`;
-            else if (field.includes("Status")) record[field] = i % 2 === 0 ? "Ativo" : "Inativo";
-            else if (field.includes("Data")) record[field] = `2024-0${i+1}-${10 + i}`;
-            else record[field] = `${field} ${i + 1}`;
-          });
-          return record;
-        });
-        
-        setModuleData(mockData);
-      }
-    }
-  }, [activeItem]);
+  // Get all cadastro modules and groups
+  const cadastroModules = getAllCadastroModules()
+  const cadastroGroups = getCadastroGroups()
 
   // Toggle group expansion
   const toggleGroup = (groupKey: string) => {
     if (expandedGroup === groupKey) {
       setExpandedGroup(null);
-      setActiveItem(null);
     } else {
       setExpandedGroup(groupKey);
-      // Set first item of the group as active
-      const group = cadastroGroups[groupKey];
-      if (group && group.items.length > 0) {
-        setActiveItem(group.items[0].id);
-      }
     }
   }
 
-  // Handle item selection
-  const handleItemSelect = (itemId: string) => {
-    setActiveItem(itemId);
-  }
-
   // Get all cadastros for filtering
-  const allCadastros = Object.values(cadastroGroups).flatMap((group: any) => 
-    group.items.map((item: any) => ({
-      ...item,
-      group: group.name,
-      groupColor: group.color
-    }))
-  );
+  const allCadastros = Object.values(cadastroModules).map(module => ({
+    ...module,
+    groupName: cadastroGroups[module.group as keyof typeof cadastroGroups].name,
+    groupColor: cadastroGroups[module.group as keyof typeof cadastroGroups].color
+  }));
 
   // Filter cadastros based on search term and active tab
-  const filteredCadastros = allCadastros.filter((cadastro: any) => {
+  const filteredCadastros = allCadastros.filter(cadastro => {
     const matchesSearch = cadastro.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           cadastro.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === "all" || cadastro.group.toLowerCase() === activeTab.toLowerCase();
+    const matchesTab = activeTab === "all" || cadastro.group === activeTab;
     return matchesSearch && matchesTab;
   });
 
@@ -456,23 +143,21 @@ export default function CadastrosPage() {
                   className="flex items-center gap-3 px-0 py-4 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent rounded-none text-gray-600 dark:text-gray-400 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
                 >
                   <Database className="h-5 w-5" />
-                  <span className="font-medium">Todos</span>
-                </TabsTrigger>
-                {Object.entries(cadastroGroups).map(([key, group]) => (
-                  <TabsTrigger
-                    key={key}
-                    value={group.name.toLowerCase()}
-                    className="flex items-center gap-3 px-0 py-4 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:bg-transparent rounded-none text-gray-600 dark:text-gray-400 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400"
+              {Object.entries(cadastroGroups)
+                .filter(([key]) => activeTab === "all" || key === activeTab)
+                    className={`flex items-center gap-3 px-0 py-4 mr-8 bg-transparent border-0 border-b-2 border-transparent transition-all duration-200 whitespace-nowrap ${
+              <div className="flex overflow-x-auto px-6 py-2">
+                {Object.values(cadastroModules)
+                  .filter(module => module.group === expandedGroup)
+                  .map(module => (
+                  <Link
+                    key={module.id}
+                    href={`/cadastros/${module.id}`}
+                    className="flex items-center gap-2 px-4 py-2 mr-4 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                   >
-                    {group.icon}
-                    <span className="font-medium">{group.name}</span>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs ${getBadgeColorClass(group.color)}`}
-                    >
-                      {group.items.length}
-                    </Badge>
-                  </TabsTrigger>
+                    <span className="text-sm">{module.icon}</span>
+                    <span className="text-sm font-medium">{module.name}</span>
+                  </Link>
                 ))}
               </TabsList>
             </div>
