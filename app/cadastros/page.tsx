@@ -354,7 +354,8 @@ export default function CadastrosPage() {
         <CardContent>
           {/* Tabs */}
           <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-            <div className="flex space-x-8">
+            <div className="flex justify-between items-center">
+              <div className="flex space-x-8">
               {tabs.map((tab) => {
                 const Icon = tab.icon
                 return (
@@ -375,6 +376,50 @@ export default function CadastrosPage() {
                   </button>
                 )
               })}
+              </div>
+              
+              {/* Quick Access to All Cadastros */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Cadastros:</span>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsUserModalOpen(true)}
+                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    title="Novo Usuário"
+                  >
+                    <Users className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsVehicleModalOpen(true)}
+                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-emerald-200 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                    title="Novo Veículo"
+                  >
+                    <Car className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsCompanyModalOpen(true)}
+                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    title="Nova Empresa"
+                  >
+                    <Building className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsLocationModalOpen(true)}
+                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-orange-200 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                    title="Novo Local"
+                  >
+                    <MapPin className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
