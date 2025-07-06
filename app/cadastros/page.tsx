@@ -1,17 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge" 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,264 +11,135 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   Home, 
-  Database, 
-  Users, 
-  Car, 
-  Building, 
-  MapPin, 
-  Settings, 
-  Plus,
   Search, 
-  Filter,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Eye,
-  ChevronDown,
+  Plus, 
+  MoreHorizontal, 
+  Car, 
+  Building2, 
+  Package, 
+  MapPin, 
+  AlertTriangle, 
+  DollarSign, 
+  Briefcase, 
+  Users, 
+  ShoppingBag, 
+  Settings, 
+  FileText, 
+  Truck, 
+  Warehouse, 
+  Route, 
+  HelpCircle, 
+  Tag, 
+  Building, 
+  Receipt, 
+  CreditCard, 
+  Map, 
+  PlusCircle, 
+  Handshake, 
+  FileContract, 
+  UserCheck, 
+  Heart, 
+  Box, 
+  ShoppingCart, 
   UserPlus, 
-  Zap,
-  Package,
-  Truck,
-  FileText,
-  Briefcase,
-  Box,
-  DollarSign,
-  Clipboard,
-  Tag,
-  Star,
-  FileCheck,
-  ShoppingBag,
-  BarChart,
-  Layers,
-  Award
+  Star, 
+  ClipboardList, 
+  Database
 } from "lucide-react"
 
-// Tipos de dados
-interface User {
-  id: string
-  name: string
-  email: string
-  role: string
-  status: "active" | "inactive"
-  createdAt: string
-}
-
-interface Vehicle {
-  id: string
-  plate: string
-  model: string
-  brand: string
-  year: number
-  status: "active" | "maintenance" | "inactive"
-  driver?: string
-}
-
-interface Company {
-  id: string
-  name: string
-  cnpj: string
-  address: string
-  phone: string
-  status: "active" | "inactive"
-}
-
-interface Location {
-  id: string
-  name: string
-  address: string
-  type: "base" | "client" | "warehouse"
-  company: string
-  coordinates?: string
-}
-
 export default function CadastrosPage() {
-  const [activeTab, setActiveTab] = useState("users")
   const [searchTerm, setSearchTerm] = useState("")
-  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false)
-  const [quickCreateType, setQuickCreateType] = useState<"user" | "vehicle" | "company" | "location">("user")
+  const [activeTab, setActiveTab] = useState("all")
 
-  // Estados dos modais
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
-  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
-  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
-  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
-  // Dados mock
-  const [users, setUsers] = useState<User[]>([
-    { id: "1", name: "João Silva", email: "joao@empresa.com", role: "Motorista", status: "active", createdAt: "2024-01-15" },
-    { id: "2", name: "Maria Santos", email: "maria@empresa.com", role: "Supervisor", status: "active", createdAt: "2024-01-14" },
-    { id: "3", name: "Carlos Lima", email: "carlos@empresa.com", role: "Técnico", status: "inactive", createdAt: "2024-01-13" },
-  ])
-
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    { id: "1", plate: "ABC-1234", model: "Civic", brand: "Honda", year: 2022, status: "active", driver: "João Silva" },
-    { id: "2", plate: "XYZ-5678", model: "Corolla", brand: "Toyota", year: 2021, status: "maintenance" },
-    { id: "3", plate: "DEF-9012", model: "Gol", brand: "Volkswagen", year: 2020, status: "active", driver: "Maria Santos" },
-  ])
-
-  const [companies, setCompanies] = useState<Company[]>([
-    { id: "1", name: "Empresa Principal", cnpj: "12.345.678/0001-90", address: "Av. Paulista, 1000", phone: "(11) 1234-5678", status: "active" },
-    { id: "2", name: "Filial Norte", cnpj: "12.345.678/0002-71", address: "Rua Augusta, 500", phone: "(11) 2345-6789", status: "active" },
-  ])
-
-  const [locations, setLocations] = useState<Location[]>([
-    { id: "1", name: "Base Central", address: "Av. Paulista, 1000", type: "base", company: "Empresa Principal" },
-    { id: "2", name: "Cliente A", address: "Rua Oscar Freire, 800", type: "client", company: "Empresa Principal" },
-    { id: "3", name: "Depósito Sul", address: "Av. Faria Lima, 2000", type: "warehouse", company: "Filial Norte" },
-  ])
-
-  // Formulários
-  const [userForm, setUserForm] = useState({
-    name: "",
-    email: "",
-    role: "",
-    phone: "",
-    cpf: "",
-    status: "active"
-  })
-
-  const [vehicleForm, setVehicleForm] = useState({
-    plate: "",
-    model: "",
-    brand: "",
-    year: new Date().getFullYear(),
-    color: "",
-    chassis: "",
-    renavam: "",
-    status: "active"
-  })
-
-  const [companyForm, setCompanyForm] = useState({
-    name: "",
-    cnpj: "",
-    address: "",
-    phone: "",
-    email: "",
-    contact: "",
-    status: "active"
-  })
-
-  const [locationForm, setLocationForm] = useState({
-    name: "",
-    address: "",
-    type: "base",
-    company: "",
-    coordinates: "",
-    description: ""
-  })
-
-  const handleQuickCreate = (type: "user" | "vehicle" | "company" | "location") => {
-    setQuickCreateType(type)
-    setIsQuickCreateOpen(false)
+  // Define all cadastros with their groups and icons
+  const cadastros = [
+    // Operacional
+    { id: "veiculos", name: "Veículos", icon: <Car className="h-5 w-5" />, group: "operacional", description: "Cadastro de veículos da frota" },
+    { id: "unidades", name: "Unidades", icon: <Building2 className="h-5 w-5" />, group: "operacional", description: "Unidades operacionais" },
+    { id: "estoques", name: "Estoques", icon: <Package className="h-5 w-5" />, group: "operacional", description: "Gestão de estoques" },
+    { id: "viagens", name: "Viagens", icon: <Route className="h-5 w-5" />, group: "operacional", description: "Cadastro de viagens" },
+    { id: "motivos", name: "Motivos", icon: <HelpCircle className="h-5 w-5" />, group: "operacional", description: "Motivos operacionais" },
+    { id: "ocorrencias", name: "Ocorrências", icon: <AlertTriangle className="h-5 w-5" />, group: "operacional", description: "Cadastro de ocorrências" },
     
-    switch (type) {
-      case "user":
-        setIsUserModalOpen(true)
-        break
-      case "vehicle":
-        setIsVehicleModalOpen(true)
-        break
-      case "company":
-        setIsCompanyModalOpen(true)
-        break
-      case "location":
-        setIsLocationModalOpen(true)
-        break
-    }
-  }
-
-  const resetForms = () => {
-    setUserForm({ name: "", email: "", role: "", phone: "", cpf: "", status: "active" })
-    setVehicleForm({ plate: "", model: "", brand: "", year: new Date().getFullYear(), color: "", chassis: "", renavam: "", status: "active" })
-    setCompanyForm({ name: "", cnpj: "", address: "", phone: "", email: "", contact: "", status: "active" })
-    setLocationForm({ name: "", address: "", type: "base", company: "", coordinates: "", description: "" })
-  }
-
-  const handleCreateUser = () => {
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userForm.name,
-      email: userForm.email,
-      role: userForm.role,
-      status: userForm.status as "active" | "inactive",
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-    setUsers([...users, newUser])
-    setIsUserModalOpen(false)
-    resetForms()
-  }
-
-  const handleCreateVehicle = () => {
-    const newVehicle: Vehicle = {
-      id: Date.now().toString(),
-      plate: vehicleForm.plate,
-      model: vehicleForm.model,
-      brand: vehicleForm.brand,
-      year: vehicleForm.year,
-      status: vehicleForm.status as "active" | "maintenance" | "inactive"
-    }
-    setVehicles([...vehicles, newVehicle])
-    setIsVehicleModalOpen(false)
-    resetForms()
-  }
-
-  const handleCreateCompany = () => {
-    const newCompany: Company = {
-      id: Date.now().toString(),
-      name: companyForm.name,
-      cnpj: companyForm.cnpj,
-      address: companyForm.address,
-      phone: companyForm.phone,
-      status: companyForm.status as "active" | "inactive"
-    }
-    setCompanies([...companies, newCompany])
-    setIsCompanyModalOpen(false)
-    resetForms()
-  }
-
-  const handleCreateLocation = () => {
-    const newLocation: Location = {
-      id: Date.now().toString(),
-      name: locationForm.name,
-      address: locationForm.address,
-      type: locationForm.type as "base" | "client" | "warehouse",
-      company: locationForm.company
-    }
-    setLocations([...locations, newLocation])
-    setIsLocationModalOpen(false)
-    resetForms()
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      active: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700",
-      inactive: "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600",
-      maintenance: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700"
-    }
+    // Financeiro
+    { id: "tarifas", name: "Tarifas", icon: <DollarSign className="h-5 w-5" />, group: "financeiro", description: "Tarifas gerais" },
+    { id: "tarifas-unidade", name: "Tarifas por Unidade", icon: <Building className="h-5 w-5" />, group: "financeiro", description: "Tarifas específicas por unidade" },
+    { id: "tarifas-servico", name: "Tarifas por Serviço", icon: <Tag className="h-5 w-5" />, group: "financeiro", description: "Tarifas específicas por serviço" },
+    { id: "taxas", name: "Taxas", icon: <Receipt className="h-5 w-5" />, group: "financeiro", description: "Taxas e impostos" },
+    { id: "setores-tarifarios", name: "Setores Tarifários", icon: <Map className="h-5 w-5" />, group: "financeiro", description: "Setores para tarifação" },
+    { id: "despesas-extras", name: "Despesas Extras", icon: <CreditCard className="h-5 w-5" />, group: "financeiro", description: "Cadastro de despesas extras" },
+    { id: "acordos-compra", name: "Acordos de Compra", icon: <Handshake className="h-5 w-5" />, group: "financeiro", description: "Acordos comerciais de compra" },
+    { id: "categorias", name: "Categorias", icon: <Tag className="h-5 w-5" />, group: "financeiro", description: "Categorias financeiras" },
+    { id: "segmentos-contabeis", name: "Segmentos Contábeis", icon: <FileText className="h-5 w-5" />, group: "financeiro", description: "Segmentos para contabilidade" },
     
-    const labels = {
-      active: "Ativo",
-      inactive: "Inativo", 
-      maintenance: "Manutenção"
-    }
-
-    return (
-      <Badge className={statusConfig[status as keyof typeof statusConfig]}>
-        {labels[status as keyof typeof labels]}
-      </Badge>
-    )
-  }
-
-  const tabs = [
-    { id: "users", label: "Usuários", icon: Users, count: users.length },
-    { id: "vehicles", label: "Veículos", icon: Car, count: vehicles.length },
-    { id: "companies", label: "Empresas", icon: Building, count: companies.length },
-    { id: "locations", label: "Locais", icon: MapPin, count: locations.length },
+    // Comercial
+    { id: "clientes", name: "Clientes", icon: <Users className="h-5 w-5" />, group: "comercial", description: "Cadastro de clientes" },
+    { id: "contratos", name: "Contratos", icon: <FileContract className="h-5 w-5" />, group: "comercial", description: "Gestão de contratos" },
+    { id: "prestadores", name: "Prestadores", icon: <UserCheck className="h-5 w-5" />, group: "comercial", description: "Cadastro de prestadores" },
+    { id: "relacionamento", name: "Relacionamento", icon: <Heart className="h-5 w-5" />, group: "comercial", description: "Gestão de relacionamento" },
+    
+    // Produtos
+    { id: "itens", name: "Itens", icon: <Box className="h-5 w-5" />, group: "produtos", description: "Cadastro de itens" },
+    { id: "produtos", name: "Produtos", icon: <ShoppingCart className="h-5 w-5" />, group: "produtos", description: "Cadastro de produtos" },
+    
+    // Pessoas
+    { id: "grupos", name: "Grupos", icon: <UserPlus className="h-5 w-5" />, group: "pessoas", description: "Grupos de pessoas" },
+    { id: "habilidades", name: "Habilidades", icon: <Star className="h-5 w-5" />, group: "pessoas", description: "Cadastro de habilidades" },
+    { id: "avaliacoes", name: "Avaliações", icon: <ClipboardList className="h-5 w-5" />, group: "pessoas", description: "Avaliações de desempenho" },
+    
+    // Configurações
+    { id: "formularios", name: "Formulários", icon: <Settings className="h-5 w-5" />, group: "configuracoes", description: "Configuração de formulários" },
   ]
+
+  // Group icons for tabs
+  const groupIcons = {
+    "operacional": <Truck className="h-5 w-5" />,
+    "financeiro": <DollarSign className="h-5 w-5" />,
+    "comercial": <Briefcase className="h-5 w-5" />,
+    "produtos": <ShoppingBag className="h-5 w-5" />,
+    "pessoas": <Users className="h-5 w-5" />,
+    "configuracoes": <Settings className="h-5 w-5" />,
+  }
+
+  // Filter cadastros based on search term and active tab
+  const filteredCadastros = cadastros.filter(cadastro => {
+    const matchesSearch = cadastro.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          cadastro.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesTab = activeTab === "all" || cadastro.group === activeTab
+    return matchesSearch && matchesTab
+  })
+
+  // Group cadastros by their group
+  const groupedCadastros = filteredCadastros.reduce((acc, cadastro) => {
+    if (!acc[cadastro.group]) {
+      acc[cadastro.group] = []
+    }
+    acc[cadastro.group].push(cadastro)
+    return acc
+  }, {})
+
+  // Group names for display
+  const groupNames = {
+    "operacional": "Operacional",
+    "financeiro": "Financeiro",
+    "comercial": "Comercial",
+    "produtos": "Produtos",
+    "pessoas": "Pessoas",
+    "configuracoes": "Configurações",
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -297,1024 +159,136 @@ export default function CadastrosPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-        </div>
+        <ThemeToggle />
       </div>
 
-      {/* Main Content */}
-      <Card className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Database className="h-6 w-6 text-blue-500" />
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                Gerenciamento de Cadastros
-              </CardTitle>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Botão de Criação Rápida */}
-              <DropdownMenu open={isQuickCreateOpen} onOpenChange={setIsQuickCreateOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
-                    <Zap className="mr-2 h-4 w-4" />
-                    Criação Rápida
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                  <DropdownMenuItem 
-                    onClick={() => handleQuickCreate("user")}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Novo Usuário
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleQuickCreate("vehicle")}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Car className="mr-2 h-4 w-4" />
-                    Novo Veículo
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleQuickCreate("company")}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Building className="mr-2 h-4 w-4" />
-                    Nova Empresa
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleQuickCreate("location")}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Novo Local
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+          <Input
+            placeholder="Buscar cadastros..."
+            className="pl-10 bg-white dark:bg-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Cadastro
+        </Button>
+      </div>
 
-              <Button 
-                variant="outline" 
-                className="bg-white/50 dark:bg-gray-800/50"
-                onClick={() => setIsSettingsOpen(true)}
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="bg-gray-100 dark:bg-gray-800 p-1 overflow-x-auto flex w-full">
+          <TabsTrigger value="all" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            <span>Todos</span>
+          </TabsTrigger>
+          <TabsTrigger value="operacional" className="flex items-center gap-2">
+            {groupIcons.operacional}
+            <span>Operacional</span>
+          </TabsTrigger>
+          <TabsTrigger value="financeiro" className="flex items-center gap-2">
+            {groupIcons.financeiro}
+            <span>Financeiro</span>
+          </TabsTrigger>
+          <TabsTrigger value="comercial" className="flex items-center gap-2">
+            {groupIcons.comercial}
+            <span>Comercial</span>
+          </TabsTrigger>
+          <TabsTrigger value="produtos" className="flex items-center gap-2">
+            {groupIcons.produtos}
+            <span>Produtos</span>
+          </TabsTrigger>
+          <TabsTrigger value="pessoas" className="flex items-center gap-2">
+            {groupIcons.pessoas}
+            <span>Pessoas</span>
+          </TabsTrigger>
+          <TabsTrigger value="configuracoes" className="flex items-center gap-2">
+            {groupIcons.configuracoes}
+            <span>Configurações</span>
+          </TabsTrigger>
+        </TabsList>
 
-        <CardContent>
-          {/* Tabs */}
-          <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-8">
-              {tabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-0 py-4 border-b-2 transition-colors ${
-                      activeTab === tab.id
-                        ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                        : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{tab.label}</span>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                      {tab.count}
-                    </Badge>
-                  </button>
-                )
-              })}
-              </div>
-              
-              {/* Dropdown para outros cadastros */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="ml-auto bg-white/50 dark:bg-gray-800/50 border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                  >
-                    Outros Cadastros
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Truck className="mr-2 h-4 w-4 text-blue-500" />
-                    Veículos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Building className="mr-2 h-4 w-4 text-purple-500" />
-                    Unidades
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Briefcase className="mr-2 h-4 w-4 text-emerald-500" />
-                    Clientes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <FileText className="mr-2 h-4 w-4 text-amber-500" />
-                    Contratos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Package className="mr-2 h-4 w-4 text-indigo-500" />
-                    Produtos
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Box className="mr-2 h-4 w-4 text-cyan-500" />
-                    Estoques
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Clipboard className="mr-2 h-4 w-4 text-rose-500" />
-                    Ocorrências
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Tag className="mr-2 h-4 w-4 text-orange-500" />
-                    Itens
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Users className="mr-2 h-4 w-4 text-teal-500" />
-                    Prestadores
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <DollarSign className="mr-2 h-4 w-4 text-green-500" />
-                    Tarifas
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <ShoppingBag className="mr-2 h-4 w-4 text-red-500" />
-                    Despesas Extras
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <BarChart className="mr-2 h-4 w-4 text-blue-500" />
-                    Taxas
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <MapPin className="mr-2 h-4 w-4 text-violet-500" />
-                    Setores Tarifários
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <FileCheck className="mr-2 h-4 w-4 text-emerald-500" />
-                    Motivos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Users className="mr-2 h-4 w-4 text-amber-500" />
-                    Grupos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Zap className="mr-2 h-4 w-4 text-blue-500" />
-                    Habilidades
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Layers className="mr-2 h-4 w-4 text-indigo-500" />
-                    Categorias
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Star className="mr-2 h-4 w-4 text-yellow-500" />
-                    Avaliações
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <FileText className="mr-2 h-4 w-4 text-teal-500" />
-                    Formulários
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <ShoppingBag className="mr-2 h-4 w-4 text-purple-500" />
-                    Acordos de Compra
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <BarChart className="mr-2 h-4 w-4 text-gray-500" />
-                    Segmentos Contábeis
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => setIsQuickCreateOpen(false)}
-                    className="text-gray-900 dark:text-gray-100 cursor-pointer"
-                  >
-                    <Award className="mr-2 h-4 w-4 text-orange-500" />
-                    Relacionamento Comercial
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {/* Quick Access to All Cadastros */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Cadastros:</span>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsUserModalOpen(true)}
-                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                    title="Novo Usuário"
-                  >
-                    <Users className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsVehicleModalOpen(true)}
-                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-emerald-200 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                    title="Novo Veículo"
-                  >
-                    <Car className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsCompanyModalOpen(true)}
-                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                    title="Nova Empresa"
-                  >
-                    <Building className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsLocationModalOpen(true)}
-                    className="h-8 px-3 bg-white/50 dark:bg-gray-800/50 border-orange-200 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-                    title="Novo Local"
-                  >
-                    <MapPin className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/50 dark:bg-gray-800/50"
-              />
-            </div>
-            <Button variant="outline" className="bg-white/50 dark:bg-gray-800/50">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtros
-            </Button>
-          </div>
-
-          {/* Content Tables */}
-          {activeTab === "users" && (
-            <div className="border rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Função</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Criado em</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{user.createdAt}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
+        {/* Tab Content */}
+        <TabsContent value={activeTab} className="mt-6">
+          {Object.keys(groupedCadastros).length > 0 ? (
+            <div className="space-y-8">
+              {Object.entries(groupedCadastros).map(([group, items]) => (
+                <div key={group} className="space-y-4">
+                  {activeTab === "all" && (
+                    <div className="flex items-center gap-2">
+                      {groupIcons[group]}
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">{groupNames[group]}</h2>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {items.map((cadastro) => (
+                      <Card key={cadastro.id} className="hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                {cadastro.icon}
+                              </div>
+                              <CardTitle className="text-lg">{cadastro.name}</CardTitle>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Plus className="mr-2 h-4 w-4" />
+                                  Novo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Search className="mr-2 h-4 w-4" />
+                                  Visualizar
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                  <Settings className="mr-2 h-4 w-4" />
+                                  Configurar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                          <CardDescription>{cadastro.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex justify-between items-center">
+                            <Badge variant="outline" className="text-xs">
+                              {groupNames[cadastro.group]}
+                            </Badge>
+                            <Button variant="ghost" size="sm" className="h-8 px-2 text-blue-600 dark:text-blue-400">
+                              Acessar
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Visualizar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {activeTab === "vehicles" && (
-            <div className="border rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Placa</TableHead>
-                    <TableHead>Modelo</TableHead>
-                    <TableHead>Marca</TableHead>
-                    <TableHead>Ano</TableHead>
-                    <TableHead>Motorista</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {vehicles.map((vehicle) => (
-                    <TableRow key={vehicle.id}>
-                      <TableCell className="font-medium">{vehicle.plate}</TableCell>
-                      <TableCell>{vehicle.model}</TableCell>
-                      <TableCell>{vehicle.brand}</TableCell>
-                      <TableCell>{vehicle.year}</TableCell>
-                      <TableCell>{vehicle.driver || "-"}</TableCell>
-                      <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Visualizar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {activeTab === "companies" && (
-            <div className="border rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>CNPJ</TableHead>
-                    <TableHead>Endereço</TableHead>
-                    <TableHead>Telefone</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {companies.map((company) => (
-                    <TableRow key={company.id}>
-                      <TableCell className="font-medium">{company.name}</TableCell>
-                      <TableCell>{company.cnpj}</TableCell>
-                      <TableCell>{company.address}</TableCell>
-                      <TableCell>{company.phone}</TableCell>
-                      <TableCell>{getStatusBadge(company.status)}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Visualizar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {activeTab === "locations" && (
-            <div className="border rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Endereço</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Empresa</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {locations.map((location) => (
-                    <TableRow key={location.id}>
-                      <TableCell className="font-medium">{location.name}</TableCell>
-                      <TableCell>{location.address}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {location.type === "base" ? "Base" : location.type === "client" ? "Cliente" : "Depósito"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{location.company}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Visualizar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Modal de Usuário */}
-      <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
-              Novo Usuário
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os dados para criar um novo usuário no sistema.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="user-name">Nome completo</Label>
-                <Input
-                  id="user-name"
-                  value={userForm.name}
-                  onChange={(e) => setUserForm({...userForm, name: e.target.value})}
-                  placeholder="João Silva"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="user-email">Email</Label>
-                <Input
-                  id="user-email"
-                  type="email"
-                  value={userForm.email}
-                  onChange={(e) => setUserForm({...userForm, email: e.target.value})}
-                  placeholder="joao@empresa.com"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="user-role">Função</Label>
-                <Select value={userForm.role} onValueChange={(value) => setUserForm({...userForm, role: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a função" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="motorista">Motorista</SelectItem>
-                    <SelectItem value="supervisor">Supervisor</SelectItem>
-                    <SelectItem value="tecnico">Técnico</SelectItem>
-                    <SelectItem value="administrador">Administrador</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="user-phone">Telefone</Label>
-                <Input
-                  id="user-phone"
-                  value={userForm.phone}
-                  onChange={(e) => setUserForm({...userForm, phone: e.target.value})}
-                  placeholder="(11) 99999-9999"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="user-cpf">CPF</Label>
-                <Input
-                  id="user-cpf"
-                  value={userForm.cpf}
-                  onChange={(e) => setUserForm({...userForm, cpf: e.target.value})}
-                  placeholder="123.456.789-00"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="user-status">Status</Label>
-                <Select value={userForm.status} onValueChange={(value) => setUserForm({...userForm, status: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsUserModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleCreateUser} className="bg-blue-500 hover:bg-blue-600">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Criar Usuário
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de Veículo */}
-      <Dialog open={isVehicleModalOpen} onOpenChange={setIsVehicleModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Car className="h-5 w-5 text-blue-500" />
-              Novo Veículo
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os dados para cadastrar um novo veículo.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-plate">Placa</Label>
-                <Input
-                  id="vehicle-plate"
-                  value={vehicleForm.plate}
-                  onChange={(e) => setVehicleForm({...vehicleForm, plate: e.target.value})}
-                  placeholder="ABC-1234"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-brand">Marca</Label>
-                <Input
-                  id="vehicle-brand"
-                  value={vehicleForm.brand}
-                  onChange={(e) => setVehicleForm({...vehicleForm, brand: e.target.value})}
-                  placeholder="Honda"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-model">Modelo</Label>
-                <Input
-                  id="vehicle-model"
-                  value={vehicleForm.model}
-                  onChange={(e) => setVehicleForm({...vehicleForm, model: e.target.value})}
-                  placeholder="Civic"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-year">Ano</Label>
-                <Input
-                  id="vehicle-year"
-                  type="number"
-                  value={vehicleForm.year}
-                  onChange={(e) => setVehicleForm({...vehicleForm, year: parseInt(e.target.value)})}
-                  placeholder="2024"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-color">Cor</Label>
-                <Input
-                  id="vehicle-color"
-                  value={vehicleForm.color}
-                  onChange={(e) => setVehicleForm({...vehicleForm, color: e.target.value})}
-                  placeholder="Branco"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-status">Status</Label>
-                <Select value={vehicleForm.status} onValueChange={(value) => setVehicleForm({...vehicleForm, status: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Ativo</SelectItem>
-                    <SelectItem value="maintenance">Manutenção</SelectItem>
-                    <SelectItem value="inactive">Inativo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-chassis">Chassi</Label>
-                <Input
-                  id="vehicle-chassis"
-                  value={vehicleForm.chassis}
-                  onChange={(e) => setVehicleForm({...vehicleForm, chassis: e.target.value})}
-                  placeholder="9BWZZZ377VT004251"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-renavam">RENAVAM</Label>
-                <Input
-                  id="vehicle-renavam"
-                  value={vehicleForm.renavam}
-                  onChange={(e) => setVehicleForm({...vehicleForm, renavam: e.target.value})}
-                  placeholder="12345678901"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsVehicleModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleCreateVehicle} className="bg-blue-500 hover:bg-blue-600">
-              <Plus className="mr-2 h-4 w-4" />
-              Criar Veículo
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de Empresa */}
-      <Dialog open={isCompanyModalOpen} onOpenChange={setIsCompanyModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Building className="h-5 w-5 text-blue-500" />
-              Nova Empresa
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os dados para cadastrar uma nova empresa.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="company-name">Nome da empresa</Label>
-              <Input
-                id="company-name"
-                value={companyForm.name}
-                onChange={(e) => setCompanyForm({...companyForm, name: e.target.value})}
-                placeholder="Empresa Exemplo Ltda"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="company-cnpj">CNPJ</Label>
-                <Input
-                  id="company-cnpj"
-                  value={companyForm.cnpj}
-                  onChange={(e) => setCompanyForm({...companyForm, cnpj: e.target.value})}
-                  placeholder="12.345.678/0001-90"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company-phone">Telefone</Label>
-                <Input
-                  id="company-phone"
-                  value={companyForm.phone}
-                  onChange={(e) => setCompanyForm({...companyForm, phone: e.target.value})}
-                  placeholder="(11) 1234-5678"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company-address">Endereço</Label>
-              <Input
-                id="company-address"
-                value={companyForm.address}
-                onChange={(e) => setCompanyForm({...companyForm, address: e.target.value})}
-                placeholder="Av. Paulista, 1000 - São Paulo, SP"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="company-email">Email</Label>
-                <Input
-                  id="company-email"
-                  type="email"
-                  value={companyForm.email}
-                  onChange={(e) => setCompanyForm({...companyForm, email: e.target.value})}
-                  placeholder="contato@empresa.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company-contact">Contato</Label>
-                <Input
-                  id="company-contact"
-                  value={companyForm.contact}
-                  onChange={(e) => setCompanyForm({...companyForm, contact: e.target.value})}
-                  placeholder="João Silva"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company-status">Status</Label>
-              <Select value={companyForm.status} onValueChange={(value) => setCompanyForm({...companyForm, status: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="inactive">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCompanyModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleCreateCompany} className="bg-blue-500 hover:bg-blue-600">
-              <Plus className="mr-2 h-4 w-4" />
-              Criar Empresa
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de Local */}
-      <Dialog open={isLocationModalOpen} onOpenChange={setIsLocationModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue-500" />
-              Novo Local
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os dados para cadastrar um novo local.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="location-name">Nome do local</Label>
-              <Input
-                id="location-name"
-                value={locationForm.name}
-                onChange={(e) => setLocationForm({...locationForm, name: e.target.value})}
-                placeholder="Base Central"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location-address">Endereço</Label>
-              <Input
-                id="location-address"
-                value={locationForm.address}
-                onChange={(e) => setLocationForm({...locationForm, address: e.target.value})}
-                placeholder="Av. Paulista, 1000 - São Paulo, SP"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="location-type">Tipo</Label>
-                <Select value={locationForm.type} onValueChange={(value) => setLocationForm({...locationForm, type: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="base">Base</SelectItem>
-                    <SelectItem value="client">Cliente</SelectItem>
-                    <SelectItem value="warehouse">Depósito</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location-company">Empresa</Label>
-                <Select value={locationForm.company} onValueChange={(value) => setLocationForm({...locationForm, company: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a empresa" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {companies.map((company) => (
-                      <SelectItem key={company.id} value={company.name}>
-                        {company.name}
-                      </SelectItem>
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location-coordinates">Coordenadas (opcional)</Label>
-              <Input
-                id="location-coordinates"
-                value={locationForm.coordinates}
-                onChange={(e) => setLocationForm({...locationForm, coordinates: e.target.value})}
-                placeholder="-23.5505, -46.6333"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location-description">Descrição (opcional)</Label>
-              <Textarea
-                id="location-description"
-                value={locationForm.description}
-                onChange={(e) => setLocationForm({...locationForm, description: e.target.value})}
-                placeholder="Descrição adicional do local..."
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsLocationModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleCreateLocation} className="bg-blue-500 hover:bg-blue-600">
-              <Plus className="mr-2 h-4 w-4" />
-              Criar Local
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Modal de Configurações */}
-      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-gray-800">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-blue-500" />
-              Configurações do Sistema
-            </DialogTitle>
-            <DialogDescription>
-              Configure as opções do sistema de cadastros.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Notificações</Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Receber notificações de novos cadastros
-                  </p>
+                  </div>
                 </div>
-                <Checkbox defaultChecked />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Auto-backup</Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Backup automático dos dados
-                  </p>
-                </div>
-                <Checkbox defaultChecked />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Validação rigorosa</Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Validação mais rigorosa nos formulários
-                  </p>
-                </div>
-                <Checkbox />
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Tema padrão</Label>
-                <Select defaultValue="auto">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Claro</SelectItem>
-                    <SelectItem value="dark">Escuro</SelectItem>
-                    <SelectItem value="auto">Automático</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Idioma</Label>
-                <Select defaultValue="pt-br">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt-br">Português (Brasil)</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              ))}
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={() => setIsSettingsOpen(false)} className="bg-blue-500 hover:bg-blue-600">
-              Salvar Configurações
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                <Search className="h-12 w-12 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">Nenhum cadastro encontrado</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
+                Não encontramos nenhum cadastro com os critérios de busca atuais. Tente ajustar sua pesquisa.
+              </p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
