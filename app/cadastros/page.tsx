@@ -49,7 +49,6 @@ import {
   Map, 
   PlusCircle, 
   Handshake, 
-  FileContract, 
   UserCheck, 
   Heart, 
   Box, 
@@ -87,7 +86,7 @@ export default function CadastrosPage() {
     
     // Comercial
     { id: "clientes", name: "Clientes", icon: <Users className="h-5 w-5" />, group: "comercial", description: "Cadastro de clientes" },
-    { id: "contratos", name: "Contratos", icon: <FileContract className="h-5 w-5" />, group: "comercial", description: "Gestão de contratos" },
+    { id: "contratos", name: "Contratos", icon: <FileText className="h-5 w-5" />, group: "comercial", description: "Gestão de contratos" },
     { id: "prestadores", name: "Prestadores", icon: <UserCheck className="h-5 w-5" />, group: "comercial", description: "Cadastro de prestadores" },
     { id: "relacionamento", name: "Relacionamento", icon: <Heart className="h-5 w-5" />, group: "comercial", description: "Gestão de relacionamento" },
     
