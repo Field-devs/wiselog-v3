@@ -1,7 +1,3 @@
-"use client"
-
-import { useParams } from "next/navigation"
-import { useState, useEffect } from "react"
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -23,26 +19,13 @@ export async function generateStaticParams() {
   }))
 }
 
-export default function CadastroModulePage() {
-  const params = useParams()
-  const moduleId = params.moduleId as string
-  const [moduleData, setModuleData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Fetch module data
-    const data = getCadastroModule(moduleId)
-    setModuleData(data)
-    setLoading(false)
-  }, [moduleId])
-
-  if (loading) {
-    return (
-      <div className="p-6 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
-  }
+export default async function CadastroModulePage({
+  params,
+}: {
+  params: { moduleId: string }
+}) {
+  const { moduleId } = params
+  const moduleData = getCadastroModule(moduleId)
 
   if (!moduleData) {
     return (
