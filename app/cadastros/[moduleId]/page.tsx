@@ -13,7 +13,15 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Home, Database } from "lucide-react"
 import { CadastroModule } from "@/components/cadastro-module"
-import { getCadastroModule } from "@/lib/cadastro-modules"
+import { getCadastroModule, getAllCadastroModules } from "@/lib/cadastro-modules"
+
+export async function generateStaticParams() {
+  const modules = getAllCadastroModules()
+  
+  return Object.keys(modules).map((moduleId) => ({
+    moduleId: moduleId,
+  }))
+}
 
 export default function CadastroModulePage() {
   const params = useParams()
