@@ -49,7 +49,7 @@ import {
   Gauge,
   MapPin,
   Clock,
-  RefreshCw,
+  RefreshCw, 
   ChevronLeft,
   ChevronRight, 
   Database,
@@ -61,46 +61,78 @@ import {
   ShoppingBag,
   BarChart3,
   Calendar,
-  PlusCircle
+  PlusCircle,
+  RotateCw,
+  Target,
+  Zap
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GlassCard, AnimatedContainer } from "@/components/design-system"
 import Link from "next/link"
-
-// Mock data (inalterado)
-const mockData = { /* ... o mesmo conteúdo mock que você já possui ... */ }
+import { EnhancedProgressBar } from "@/components/enhanced-progress-bar"
 
 export default function HomePage() {
   const [selectedCompany, setSelectedCompany] = useState("1")
-  const [activeTab, setActiveTab] = useState("dashboard")
+  const [activeTab, setActiveTab] = useState("monitoring")
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const [stats, setStats] = useState({
-    activeUsers: 0,
-    pendingTasks: 0,
-    completedTasks: 0,
-    totalRevenue: 0
+    onlineUsers: 0,
+    totalUsers: 0,
+    onSite: 0,
+    offSite: 0,
+    base: 0,
+    totalTasks: 0,
+    dailyProductivity: 0,
+    timeInTransit: 0,
+    transitPercentage: 0,
+    plannedDistance: 0
   })
   
   // Simulate loading data
   useEffect(() => {
+    setIsLoading(true)
     const timer = setTimeout(() => {
       setStats({
-        activeUsers: 216,
-        pendingTasks: 18,
-        completedTasks: 342,
-        totalRevenue: 28750
+        onlineUsers: 216,
+        totalUsers: 342,
+        onSite: 124,
+        offSite: 42,
+        base: 50,
+        totalTasks: 78,
+        dailyProductivity: 4.5,
+        timeInTransit: 3.2,
+        transitPercentage: 65,
+        plannedDistance: 1240
       })
+      setIsLoading(false)
     }, 1000)
     
     return () => clearTimeout(timer)
   }, [])
 
+  // Mock data for recent activities
+  const recentActivities = [
+    { id: 1, name: "João Silva", hour: "14:30", location: "Av. Paulista", type: "map-marker", color: "emerald", description: "Check-in realizado" },
+    { id: 2, name: "Maria Santos", hour: "14:15", location: "Matriz", type: "building", color: "blue", description: "Entrada registrada" },
+    { id: 3, name: "Carlos Oliveira", hour: "13:45", location: "Cliente ABC", type: "user", color: "purple", description: "Visita iniciada" },
+    { id: 4, name: "Ana Costa", hour: "13:30", location: "Rua Augusta", type: "map-marker", color: "emerald", description: "Check-in realizado" },
+    { id: 5, name: "Pedro Lima", hour: "13:00", location: "Matriz", type: "building", color: "blue", description: "Saída registrada" },
+    { id: 6, name: "Lucia Fernandes", hour: "12:45", location: "Cliente XYZ", type: "user", color: "purple", description: "Visita finalizada" },
+    { id: 7, name: "Roberto Mendes", hour: "12:30", location: "Shopping Ibirapuera", type: "map-marker", color: "emerald", description: "Check-in realizado" },
+  ]
+
   const refreshData = () => {
     setIsLoading(true)
     setTimeout(() => setIsLoading(false), 1000)
   }
+
+  // Calculate percentages for pie charts
+  const onSitePercentage = Math.round((stats.onSite / (stats.onSite + stats.offSite + stats.base)) * 100) || 0
+  const offSitePercentage = Math.round((stats.offSite / (stats.onSite + stats.offSite + stats.base)) * 100) || 0
+  const basePercentage = Math.round((stats.base / (stats.onSite + stats.offSite + stats.base)) * 100) || 0
+  const onlinePercentage = Math.round((stats.onlineUsers / stats.totalUsers) * 100) || 0
 
   return (
     <div className="p-6 space-y-6">
@@ -116,314 +148,565 @@ export default function HomePage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+            <SelectTrigger className="w-[200px] bg-white dark:bg-gray-800">
+              <SelectValue placeholder="Selecionar empresa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Empresa Principal</SelectItem>
+              <SelectItem value="2">Filial São Paulo</SelectItem>
+              <SelectItem value="3">Filial Rio de Janeiro</SelectItem>
+            </SelectContent>
+          </Select>
+          <ThemeToggle />
+        </div>
       </div>
       
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <AnimatedContainer delay={100} animation="fadeIn">
-          <GlassCard className="p-6">
+      {/* Online Users Stats */}
+      <AnimatedContainer delay={100} animation="fadeIn">
+        <GlassCard className="p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Usuários Ativos</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.activeUsers}</h3>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Usuários Online</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.onlineUsers}</h3>
               </div>
             </div>
-          </GlassCard>
-        </AnimatedContainer>
-        
-        <AnimatedContainer delay={200} animation="fadeIn">
-          <GlassCard className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Tarefas Pendentes</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.pendingTasks}</h3>
-              </div>
+            <div className="w-48">
+              <EnhancedProgressBar value={onlinePercentage} size="md" color="blue" />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">{stats.onlineUsers} de {stats.totalUsers} usuários</p>
             </div>
-          </GlassCard>
-        </AnimatedContainer>
-        
-        <AnimatedContainer delay={300} animation="fadeIn">
-          <GlassCard className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Tarefas Concluídas</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.completedTasks}</h3>
-              </div>
-            </div>
-          </GlassCard>
-        </AnimatedContainer>
-        
-        <AnimatedContainer delay={400} animation="fadeIn">
-          <GlassCard className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Receita Total</p>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">R$ {stats.totalRevenue.toLocaleString()}</h3>
-              </div>
-            </div>
-          </GlassCard>
-        </AnimatedContainer>
-      </div>
+          </div>
+        </GlassCard>
+      </AnimatedContainer>
       
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Access */}
-        <AnimatedContainer delay={500} animation="fadeIn" className="lg:col-span-2">
-          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <Database className="h-5 w-5 text-blue-500" />
-                Acesso Rápido
-              </CardTitle>
-              <CardDescription>Módulos mais utilizados do sistema</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <Link href="/cadastros" className="group">
-                  <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 hover:shadow-md">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
-                      <Database className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+        {/* Left Column - Charts */}
+        <div className="lg:col-span-2 space-y-6">
+          <AnimatedContainer delay={200} animation="fadeIn">
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader className="pb-2">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="monitoring" onClick={refreshData} className="flex items-center gap-2">
+                      <Activity className="h-4 w-4" />
+                      Monitoramento
+                    </TabsTrigger>
+                    <TabsTrigger value="tasks" className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Tarefas
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <TabsContent value="monitoring" className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-blue-500" />
+                      Dados de Monitoramento
+                    </CardTitle>
+                    <Button variant="outline" size="sm" onClick={refreshData} disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                          Atualizando...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Atualizar
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Connection Chart */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <Wifi className="h-5 w-5 text-blue-500" />
+                        <span className="font-medium">Conexão</span>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Online</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 dark:bg-emerald-600" style={{ width: "72%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">72%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Offline</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-gray-400 dark:bg-gray-500" style={{ width: "18%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">18%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Sem Sinal</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 dark:bg-amber-600" style={{ width: "10%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">10%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">Cadastros</span>
-                  </div>
-                </Link>
-                
-                <Link href="/teams" className="group">
-                  <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all duration-200 hover:shadow-md">
-                    <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/50 transition-colors">
-                      <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                    
+                    {/* GPS Precision Chart */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <Target className="h-5 w-5 text-emerald-500" />
+                        <span className="font-medium">Precisão GPS (m)</span>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">0-5m</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 dark:bg-emerald-600" style={{ width: "45%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">45%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">5-10m</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 dark:bg-blue-600" style={{ width: "30%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">30%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">10-20m</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 dark:bg-amber-600" style={{ width: "15%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">15%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">&gt;20m</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-red-500 dark:bg-red-600" style={{ width: "10%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">10%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">Equipes</span>
+                    
+                    {/* Battery Chart */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <Battery className="h-5 w-5 text-blue-500" />
+                        <span className="font-medium">Bateria (%)</span>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">75-100%</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 dark:bg-emerald-600" style={{ width: "60%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">60%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">50-75%</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 dark:bg-blue-600" style={{ width: "25%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">25%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">25-50%</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 dark:bg-amber-600" style={{ width: "10%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">10%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">&lt;25%</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-red-500 dark:bg-red-600" style={{ width: "5%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">5%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Speed Chart */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                        <Gauge className="h-5 w-5 text-purple-500" />
+                        <span className="font-medium">Velocidades Máximas (Km/h)</span>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">0-40 Km/h</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 dark:bg-emerald-600" style={{ width: "35%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">35%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">40-60 Km/h</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 dark:bg-blue-600" style={{ width: "40%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">40%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">60-80 Km/h</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-amber-500 dark:bg-amber-600" style={{ width: "20%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">20%</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">&gt;80 Km/h</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div className="h-full bg-red-500 dark:bg-red-600" style={{ width: "5%" }}></div>
+                              </div>
+                              <span className="text-sm font-medium">5%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </Link>
+                </TabsContent>
                 
-                <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-200 dark:hover:border-purple-800 transition-all duration-200 hover:shadow-md group">
-                  <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
-                    <Truck className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                <TabsContent value="tasks" className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-blue-500" />
+                      Tarefas Programadas
+                    </CardTitle>
+                    <Button variant="outline" size="sm" onClick={refreshData} disabled={isLoading}>
+                      {isLoading ? (
+                        <>
+                          <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                          Atualizando...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Atualizar
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Operacional</span>
-                </div>
-                
-                <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-800 transition-all duration-200 hover:shadow-md group">
-                  <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50 transition-colors">
-                    <DollarSign className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    {/* Task Stats */}
+                    <div className="md:col-span-5 space-y-4">
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-100 dark:border-blue-800/30 flex items-center justify-between">
+                        <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">TAREFAS PROGRAMADAS</span>
+                        <span className="text-5xl font-bold text-blue-600 dark:text-blue-400">{stats.totalTasks}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">PRODUTIVIDADE DIÁRIA</span>
+                          <div className="flex items-end">
+                            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.dailyProductivity}</span>
+                            <span className="text-sm text-blue-500 dark:text-blue-300 ml-1 mb-1">t/r</span>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">TEMPO EM TRÂNSITO</span>
+                          <div className="flex items-end">
+                            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.timeInTransit}</span>
+                            <span className="text-sm text-blue-500 dark:text-blue-300 ml-1 mb-1">h</span>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">TEMPO EM TRÂNSITO/TOTAL</span>
+                          <div className="flex items-end">
+                            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.transitPercentage}</span>
+                            <span className="text-sm text-blue-500 dark:text-blue-300 ml-1 mb-1">%</span>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">DESLOCAMENTO PLANEJADO</span>
+                          <div className="flex items-end">
+                            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.plannedDistance}</span>
+                            <span className="text-sm text-blue-500 dark:text-blue-300 ml-1 mb-1">Km</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Task Chart */}
+                    <div className="md:col-span-7">
+                      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 h-full flex flex-col">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Tarefas por Grupo</h3>
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="w-full h-64 flex items-center justify-center">
+                            <div className="relative w-48 h-48">
+                              {/* Placeholder for pie chart */}
+                              <div className="absolute inset-0 rounded-full border-8 border-blue-500 dark:border-blue-600 opacity-20"></div>
+                              <div className="absolute inset-0 rounded-full border-8 border-transparent border-t-blue-500 dark:border-t-blue-600 animate-spin" style={{ animationDuration: '3s' }}></div>
+                              <div className="absolute inset-0 flex items-center justify-center flex-col">
+                                <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">78</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">Total</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 mt-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Iniciadas (45%)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Executadas (35%)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-gray-500"></div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">Não Executadas (20%)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Financeiro</span>
-                </div>
-                
-                <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-200 dark:hover:border-rose-800 transition-all duration-200 hover:shadow-md group">
-                  <div className="h-12 w-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center group-hover:bg-rose-200 dark:group-hover:bg-rose-800/50 transition-colors">
-                    <Briefcase className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+                </TabsContent>
+              </CardContent>
+            </Card>
+          </AnimatedContainer>
+          
+          {/* Presence Stats */}
+          <AnimatedContainer delay={300} animation="fadeIn">
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-blue-500" />
+                  Presenças
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* OnSite */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-32 h-32 mb-4">
+                      <div className="absolute inset-0 rounded-full border-8 border-emerald-100 dark:border-emerald-900/30"></div>
+                      <div 
+                        className="absolute inset-0 rounded-full border-8 border-transparent border-t-emerald-500 dark:border-t-emerald-400"
+                        style={{ 
+                          transform: `rotate(${onSitePercentage * 3.6}deg)`,
+                          transition: 'transform 1s ease-out'
+                        }}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">{onSitePercentage}%</span>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">OnSite</h3>
+                    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700 text-base px-3 py-1">
+                      {stats.onSite}
+                    </Badge>
                   </div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Comercial</span>
-                </div>
-                
-                <div className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-200 hover:shadow-md group">
-                  <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/50 transition-colors">
-                    <Settings className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                  
+                  {/* Base */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-32 h-32 mb-4">
+                      <div className="absolute inset-0 rounded-full border-8 border-blue-100 dark:border-blue-900/30"></div>
+                      <div 
+                        className="absolute inset-0 rounded-full border-8 border-transparent border-t-blue-500 dark:border-t-blue-400"
+                        style={{ 
+                          transform: `rotate(${basePercentage * 3.6}deg)`,
+                          transition: 'transform 1s ease-out'
+                        }}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">{basePercentage}%</span>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Base</h3>
+                    <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700 text-base px-3 py-1">
+                      {stats.base}
+                    </Badge>
                   </div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Configurações</span>
+                  
+                  {/* OffSite */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-32 h-32 mb-4">
+                      <div className="absolute inset-0 rounded-full border-8 border-purple-100 dark:border-purple-900/30"></div>
+                      <div 
+                        className="absolute inset-0 rounded-full border-8 border-transparent border-t-purple-500 dark:border-t-purple-400"
+                        style={{ 
+                          transform: `rotate(${offSitePercentage * 3.6}deg)`,
+                          transition: 'transform 1s ease-out'
+                        }}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">{offSitePercentage}%</span>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">OffSite</h3>
+                    <Badge className="bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700 text-base px-3 py-1">
+                      {stats.offSite}
+                    </Badge>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </AnimatedContainer>
+              </CardContent>
+            </Card>
+          </AnimatedContainer>
+        </div>
         
-        {/* Recent Activity */}
-        <AnimatedContainer delay={600} animation="fadeIn">
-          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-500" />
-                Atividades Recentes
-              </CardTitle>
-              <CardDescription>Últimas ações no sistema</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                    <PlusCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        {/* Right Column - Map and Activities */}
+        <div className="space-y-6">
+          {/* Map */}
+          <AnimatedContainer delay={400} animation="fadeIn">
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-blue-500" />
+                  Localização
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="relative w-full h-[300px] bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                  {/* Map Placeholder */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex flex-col items-center justify-center">
+                    <MapPin className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" />
+                    <p className="text-gray-500 dark:text-gray-400">Mapa de localização</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Novo cadastro criado</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Veículo ABC-1234 adicionado</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Há 10 minutos</p>
-                  </div>
+                  
+                  {/* Sample Markers */}
+                  <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-emerald-500 rounded-full animate-ping"></div>
+                  <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-emerald-500 rounded-full"></div>
+                  
+                  <div className="absolute top-1/2 left-2/3 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
+                  <div className="absolute top-1/2 left-2/3 w-3 h-3 bg-blue-500 rounded-full"></div>
+                  
+                  <div className="absolute top-3/4 left-1/4 w-3 h-3 bg-purple-500 rounded-full animate-ping"></div>
+                  <div className="absolute top-3/4 left-1/4 w-3 h-3 bg-purple-500 rounded-full"></div>
                 </div>
+              </CardContent>
+            </Card>
+          </AnimatedContainer>
+          
+          {/* Recent Activities */}
+          <AnimatedContainer delay={500} animation="fadeIn">
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-blue-500" />
+                  Últimas Atividades
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gray-200 dark:border-gray-700">
+                      <TableHead className="text-gray-700 dark:text-gray-300">Colab.</TableHead>
+                      <TableHead className="text-gray-700 dark:text-gray-300">Hora</TableHead>
+                      <TableHead className="text-gray-700 dark:text-gray-300">Local</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentActivities.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((activity) => (
+                      <TableRow key={activity.id} className="border-gray-200 dark:border-gray-700">
+                        <TableCell className="font-medium text-gray-900 dark:text-gray-100">{activity.name}</TableCell>
+                        <TableCell className="text-gray-900 dark:text-gray-100">{activity.hour}</TableCell>
+                        <TableCell>
+                          <Badge 
+                            className={`
+                              ${activity.color === 'emerald' ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700' : ''}
+                              ${activity.color === 'blue' ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700' : ''}
+                              ${activity.color === 'purple' ? 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700' : ''}
+                            `}
+                          >
+                            {activity.type === 'map-marker' && <MapPin className="h-3 w-3 mr-1" />}
+                            {activity.type === 'building' && <Home className="h-3 w-3 mr-1" />}
+                            {activity.type === 'user' && <Users className="h-3 w-3 mr-1" />}
+                            {activity.location.length > 15 ? `${activity.location.substring(0, 15)}...` : activity.location}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
                 
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                    <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Usuário atualizado</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">João Silva - Permissões modificadas</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Há 25 minutos</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                    <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Relatório gerado</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Relatório mensal de operações</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Há 2 horas</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                    <Settings className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Configuração alterada</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Parâmetros do sistema atualizados</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Há 1 dia</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </AnimatedContainer>
-      </div>
-      
-      {/* Calendar and Tasks */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar */}
-        <AnimatedContainer delay={700} animation="fadeIn" className="lg:col-span-2">
-          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-500" />
-                Calendário de Eventos
-              </CardTitle>
-              <CardDescription>Próximos eventos e compromissos</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg border border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
-                      <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">Reunião de Planejamento</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Sala de Conferência</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Hoje</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">14:00 - 15:30</p>
+                {/* Pagination */}
+                <div className="flex items-center justify-center p-4">
+                  <div className="flex gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {Array.from({ length: Math.ceil(recentActivities.length / itemsPerPage) }).map((_, i) => (
+                      <Button
+                        key={i}
+                        variant={currentPage === i + 1 ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(i + 1)}
+                        className="h-8 w-8 p-0"
+                      >
+                        {i + 1}
+                      </Button>
+                    ))}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(recentActivities.length / itemsPerPage)))}
+                      disabled={currentPage === Math.ceil(recentActivities.length / itemsPerPage)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                      <Truck className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">Entrega Programada</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Cliente XYZ</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Amanhã</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">09:00 - 11:00</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                      <BarChart3 className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">Apresentação de Resultados</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Auditório Principal</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Quinta-feira</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">15:00 - 16:30</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </AnimatedContainer>
-        
-        {/* Tasks */}
-        <AnimatedContainer delay={800} animation="fadeIn">
-          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-500" />
-                Tarefas Pendentes
-              </CardTitle>
-              <CardDescription>Suas tarefas para hoje</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex-shrink-0">
-                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Revisar relatório mensal</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Prioridade alta</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex-shrink-0">
-                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Atualizar cadastro de clientes</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Prioridade média</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex-shrink-0">
-                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Agendar reunião com fornecedores</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Prioridade baixa</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <div className="flex-shrink-0">
-                    <input type="checkbox" className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Preparar apresentação trimestral</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Prioridade alta</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </AnimatedContainer>
+              </CardContent>
+            </Card>
+          </AnimatedContainer>
+        </div>
       </div>
     </div>
   )
