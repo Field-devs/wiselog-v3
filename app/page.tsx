@@ -190,8 +190,8 @@ export default function HomePage() {
         <div className="lg:col-span-2 space-y-6">
           <AnimatedContainer delay={200} animation="fadeIn">
             <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-              <CardHeader className="pb-2">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <CardHeader className="pb-2">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="monitoring" onClick={refreshData} className="flex items-center gap-2">
                       <Activity className="h-4 w-4" />
@@ -202,9 +202,8 @@ export default function HomePage() {
                       Tarefas
                     </TabsTrigger>
                   </TabsList>
-                </Tabs>
-              </CardHeader>
-              <CardContent className="pt-4">
+                </CardHeader>
+                <CardContent className="pt-4">
                 <TabsContent value="monitoring" className="space-y-6">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-xl font-bold flex items-center gap-2">
@@ -511,7 +510,8 @@ export default function HomePage() {
                     </div>
                   </div>
                 </TabsContent>
-              </CardContent>
+                </CardContent>
+              </Tabs>
             </Card>
           </AnimatedContainer>
           
