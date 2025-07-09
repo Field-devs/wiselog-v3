@@ -240,21 +240,6 @@ const cadastroModules = {
     ],
     relationships: ["Prestadores", "Itens"]
   },
-  "categorias": {
-    id: "categorias",
-    name: "Categorias",
-    icon: <Tag className="h-5 w-5" />,
-    group: "financeiro",
-    description: "Categorias financeiras",
-    fields: [
-      { name: "nome", type: "text", label: "Nome", required: true, showInTable: true },
-      { name: "codigoExterno", type: "text", label: "Código Externo", showInTable: true },
-      { name: "contaContabil", type: "text", label: "Conta Contábil", showInTable: true },
-      { name: "estimativaCusto", type: "currency", label: "Estimativa de Custo", showInTable: true },
-      { name: "descricao", type: "textarea", label: "Descrição" },
-    ],
-    relationships: []
-  },
   "segmentos-contabeis": {
     id: "segmentos-contabeis",
     name: "Segmentos Contábeis",
@@ -435,6 +420,21 @@ const cadastroModules = {
       { name: "tipoCadastro", type: "text", label: "Tipo de Cadastro Vinculado", required: true, showInTable: true },
       { name: "campos", type: "textarea", label: "Campos", required: true },
       { name: "ativo", type: "checkbox", label: "Ativo", showInTable: true },
+      { name: "descricao", type: "textarea", label: "Descrição" },
+    ],
+    relationships: []
+  },
+  "categorias": {
+    id: "categorias",
+    name: "Categorias",
+    icon: <Tag className="h-5 w-5" />,
+    group: "financeiro",
+    description: "Categorias financeiras",
+    fields: [
+      { name: "nome", type: "text", label: "Nome", required: true, showInTable: true },
+      { name: "codigoExterno", type: "text", label: "Código Externo", showInTable: true },
+      { name: "contaContabil", type: "text", label: "Conta Contábil", showInTable: true },
+      { name: "estimativaCusto", type: "currency", label: "Estimativa de Custo", showInTable: true },
       { name: "descricao", type: "textarea", label: "Descrição" },
     ],
     relationships: []
