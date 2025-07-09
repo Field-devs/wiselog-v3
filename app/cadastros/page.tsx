@@ -1,19 +1,20 @@
 import { UnifiedCadastroHeader } from "@/components/unified-cadastro-header"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { getAllCadastroModules, getCadastroGroups } from "@/lib/cadastro-modules"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Database, Search, AlertCircle } from "lucide-react"
+import { Database, Search, AlertCircle, Filter } from "lucide-react"
 import Link from "next/link"
 import { ToastProvider } from "@/components/toast-provider"
 import { KeyboardShortcutsProvider } from "@/components/keyboard-shortcuts-provider"
-import { AnimatedContainer } from "@/components/design-system"
+import { AnimatedContainer, GlassCard } from "@/components/design-system"
 
 export default function CadastrosPage({ searchParams }: { searchParams: { group?: string } }) {
   const cadastroModules = getAllCadastroModules()
   const cadastroGroups = getCadastroGroups()
   const selectedGroup = searchParams.group || 'all'
+  const [searchTerm, setSearchTerm] = useState("")
   
   // Function to get badge color class based on group color
   const getBadgeColorClass = (color: string) => {
@@ -31,7 +32,19 @@ export default function CadastrosPage({ searchParams }: { searchParams: { group?
   // Filter modules based on selected group
   const filteredModules = Object.values(cadastroModules).filter(module => {
     if (selectedGroup === 'all') return true
-    return module.group === selectedGroup
+    
+    // Filter by group
+    const groupMatch = module.group === selectedGroup
+    
+    // If there's a search term, also filter by that
+    if (searchTerm) {
+      return groupMatch && (
+        module.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        module.description.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    
+    return groupMatch
   })
 
   // Generate mock record counts for each module
@@ -69,10 +82,86 @@ export default function CadastrosPage({ searchParams }: { searchParams: { group?
   return (
     <KeyboardShortcutsProvider>
       <ToastProvider />
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 animate-in fade-in-50 duration-300">
         <UnifiedCadastroHeader activeGroup={selectedGroup} />
         
-        <AnimatedContainer animation="fadeIn" duration={300}>
+        {/* Search Bar */}
+        <GlassCard className="p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+            <Input
+              placeholder="Buscar cadastros..."
+              className="pl-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </GlassCard>
+        
+        <AnimatedContainer animation="fadeIn" duration={300} className="transition-all">
+          {/* Group Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <GlassCard className="p-4 flex flex-col items-center justify-center text-center">
+              <Database className="h-6 w-6 mb-2 text-blue-500 dark:text-blue-400" />
+              <p className="text-sm text-gray-600 dark:text-gray-400">Total de Cadastros</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{Object.keys(cadastroModules).length}</p>
+            </GlassCard>
+            
+            {Object.entries(cadastroGroups).slice(0, 4).map(([key, group]) => (
+              <Link href={`/cadastros?group=${key}`} key={key}>
+                <GlassCard 
+                  className={`p-4 flex flex-col items-center justify-center text-center hover:shadow-lg transition-all duration-300 ${
+                    selectedGroup === key ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+                  }`}
+                >
+                  <div className={`h-6 w-6 mb-2 ${
+                    group.color === 'blue' ? 'text-blue-500 dark:text-blue-400' :
+                    group.color === 'emerald' ? 'text-emerald-500 dark:text-emerald-400' :
+                    group.color === 'purple' ? 'text-purple-500 dark:text-purple-400' :
+                    group.color === 'orange' ? 'text-orange-500 dark:text-orange-400' :
+                    group.color === 'pink' ? 'text-pink-500 dark:text-pink-400' :
+                    'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    {group.icon}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{group.name}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {Object.values(cadastroModules).filter(m => m.group === key).length}
+                  </p>
+                </GlassCard>
+              </Link>
+            ))}
+          </div>
+          
+          {/* Filter Status */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {selectedGroup === 'all' 
+                  ? 'Mostrando todos os cadastros' 
+                  : `Filtrando por: ${cadastroGroups[selectedGroup as keyof typeof cadastroGroups]?.name}`}
+                {searchTerm && ` • Busca: "${searchTerm}"`}
+              </span>
+            </div>
+            
+            {(selectedGroup !== 'all' || searchTerm) && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setSearchTerm("");
+                  if (selectedGroup !== 'all') {
+                    window.location.href = '/cadastros';
+                  }
+                }}
+                className="text-xs"
+              >
+                Limpar filtros
+              </Button>
+            )}
+          </div>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredModules.length > 0 ? (
               filteredModules.map(module => {
@@ -81,7 +170,7 @@ export default function CadastrosPage({ searchParams }: { searchParams: { group?
                 
                 return (
                   <Link key={module.id} href={`/cadastros/${module.id}`}>
-                    <Card className="h-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-all duration-200 hover:border-blue-300 dark:hover:border-blue-600">
+                    <Card className="h-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-600 hover:-translate-y-1">
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -127,10 +216,12 @@ export default function CadastrosPage({ searchParams }: { searchParams: { group?
                 <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Nenhum cadastro encontrado
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-                  Não existem cadastros disponíveis para o grupo selecionado.
+                <p className="text-gray-500 dark:text-gray-400 text-center max-w-md mb-2">
+                  {searchTerm 
+                    ? `Não foram encontrados cadastros para a busca "${searchTerm}".`
+                    : `Não existem cadastros disponíveis para o grupo ${cadastroGroups[selectedGroup as keyof typeof cadastroGroups]?.name || selectedGroup}.`}
                 </p>
-                <Button className="mt-6" asChild>
+                <Button className="mt-4" asChild>
                   <Link href="/cadastros">Voltar para Todos os Cadastros</Link>
                 </Button>
               </div>
@@ -152,6 +243,21 @@ export default function CadastrosPage({ searchParams }: { searchParams: { group?
           </div>
         </AnimatedContainer>
       </div>
+      
+      {/* Add a floating button to return to all cadastros when filtered */}
+      {selectedGroup !== 'all' && (
+        <div className="fixed bottom-6 right-6">
+          <Button 
+            asChild
+            className="rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Link href="/cadastros">
+              <Database className="mr-2 h-4 w-4" />
+              Todos os Cadastros
+            </Link>
+          </Button>
+        </div>
+      )}
     </KeyboardShortcutsProvider>
   )
 }

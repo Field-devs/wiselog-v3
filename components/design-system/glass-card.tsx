@@ -13,7 +13,7 @@ interface GlassCardProps {
 export default function GlassCard({ 
   children, 
   className = "", 
-  hover = true,
+  hover = false,
   blur = "xl" 
 }: GlassCardProps) {
   const blurClasses = {
@@ -29,7 +29,7 @@ export default function GlassCard({
         "bg-white/60 dark:bg-gray-800/60",
         blurClasses[blur],
         "border-white/20 dark:border-gray-700/30",
-        "shadow-xl border rounded-lg",
+        "shadow-lg border rounded-lg",
         hover && "hover:shadow-2xl hover:-translate-y-1 transition-all duration-300",
         className
       )}

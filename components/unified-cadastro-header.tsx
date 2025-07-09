@@ -23,44 +23,24 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   Home, 
   Search,
+  Search,
   Database,
   Truck, 
   DollarSign,
   Briefcase,
-  Users,
   ShoppingBag,
-  Box,
   Building,
-  ChevronDown,
   Menu,
   X
 } from "lucide-react"
 import { getCadastroGroups } from "@/lib/cadastro-modules"
 
-export function UnifiedCadastroHeader() {
   const pathname = usePathname()
-  const [activeGroup, setActiveGroup] = useState<string | null>(null)
+export function UnifiedCadastroHeader({ activeGroup = 'all' }: UnifiedCadastroHeaderProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
   const cadastroGroups = getCadastroGroups()
-  
-  // Set active group based on URL
-  useEffect(() => {
-    if (pathname.startsWith('/cadastros/')) {
-      const moduleId = pathname.split('/')[2]
-      
-      // Find which group this module belongs to
-      for (const [groupId, group] of Object.entries(cadastroGroups)) {
-        if (pathname.includes(groupId)) {
-          setActiveGroup(groupId)
-          break
-        }
-      }
-    } else if (pathname === '/cadastros') {
-      setActiveGroup('all')
-    }
-  }, [pathname])
   
   return (
     <div className="space-y-4">
@@ -129,7 +109,6 @@ export function UnifiedCadastroHeader() {
           <div className="overflow-x-auto">
             <Tabs 
               value={activeGroup || 'all'} 
-              onValueChange={setActiveGroup}
               className="w-full"
             >
               <TabsList className="h-auto bg-transparent p-0 px-4 space-x-6 flex w-full">
