@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Database, Search } from "lucide-react"
 import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Database, Search } from "lucide-react"
+import Link from "next/link"
 
 export default function CadastrosPage() {
   const cadastroModules = getAllCadastroModules()
@@ -18,10 +23,8 @@ export default function CadastrosPage() {
       <div className="p-6 space-y-6">
         <UnifiedCadastroHeader />
         
-        <div className="flex h-[calc(100vh-200px)]">
-          <CadastroSidebar activeGroup="all" />
-          
-          <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6 overflow-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Object.values(cadastroModules).map(module => (
                 <Link key={module.id} href={`/cadastros/${module.id}`}>
@@ -71,7 +74,6 @@ export default function CadastrosPage() {
             )}
           </div>
         </div>
-      </div>
     </KeyboardShortcutsProvider>
   )
 }

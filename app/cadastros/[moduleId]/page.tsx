@@ -13,7 +13,9 @@ import { getCadastroModule, getAllCadastroModules } from "@/lib/cadastro-modules
 import { UnifiedCadastroHeader } from "@/components/unified-cadastro-header"
 import { CadastroSidebar } from "@/components/cadastro-sidebar"
 import { ToastProvider } from "@/components/toast-provider"
+import { Button } from "@/components/ui/button"
 import { KeyboardShortcutsProvider } from "@/components/keyboard-shortcuts-provider"
+import Link from "next/link"
 
 export async function generateStaticParams() {
   const modules = getAllCadastroModules()
@@ -63,10 +65,7 @@ export default async function CadastroModulePage({
       <div className="p-6 space-y-6">
         <UnifiedCadastroHeader />
         
-        <div className="flex h-[calc(100vh-200px)]">
-          <CadastroSidebar activeGroup={moduleData.group} />
-          
-          <div className="flex-1 p-6 overflow-auto">
+        <div className="flex-1 p-6 overflow-auto">
             <EnhancedCadastroModule
               moduleId={moduleData.id}
               moduleName={moduleData.name}
@@ -76,7 +75,6 @@ export default async function CadastroModulePage({
               relationships={moduleData.relationships}
             />
           </div>
-        </div>
       </div>
     </KeyboardShortcutsProvider>
   )
