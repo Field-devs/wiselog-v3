@@ -1,112 +1,126 @@
-import { 
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Home, Database } from "lucide-react"
-import { CadastroModule } from "@/components/cadastro-module"
-import { getCadastroModule, getAllCadastroModules } from "@/lib/cadastro-modules"
+// Cadastro modules data and utility functions
 
-export async function generateStaticParams() {
-  const modules = getAllCadastroModules()
-  
-  return Object.keys(modules).map((moduleId) => ({
-    moduleId: moduleId,
-  }))
+export interface CadastroField {
+  id: string
+  name: string
+  type: 'text' | 'email' | 'number' | 'select' | 'textarea' | 'date' | 'boolean'
+  required?: boolean
+  options?: string[]
+  placeholder?: string
 }
 
-export default async function CadastroModulePage({
-  params,
-}: {
-  params: { moduleId: string }
-}) {
-  const { moduleId } = params
-  const moduleData = getCadastroModule(moduleId)
+export interface CadastroRelationship {
+  id: string
+  name: string
+  targetModule: string
+  type: 'one-to-one' | 'one-to-many' | 'many-to-many'
+}
 
-  if (!moduleData) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                  <Home className="h-4 w-4" />
-                  Dashboard
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-gray-400 dark:text-gray-500" />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/cadastros" className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                  <Database className="h-4 w-4" />
-                  Cadastros
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-gray-400 dark:text-gray-500" />
-              <BreadcrumbItem>
-                <BreadcrumbPage className="text-gray-900 dark:text-gray-100">Não Encontrado</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <ThemeToggle />
-        </div>
-        
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-            <Database className="h-12 w-12 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">
-            Módulo não encontrado
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-            O módulo de cadastro solicitado não foi encontrado. Verifique o URL ou retorne para a lista de cadastros.
-          </p>
-        </div>
-      </div>
-    )
+export interface CadastroModule {
+  id: string
+  name: string
+  icon: string
+  description: string
+  fields: CadastroField[]
+  relationships?: CadastroRelationship[]
+  group: string
+}
+
+export interface CadastroGroup {
+  id: string
+  name: string
+  description: string
+  modules: string[]
+}
+
+// Sample data - replace with your actual data source
+const cadastroModules: Record<string, CadastroModule> = {
+  users: {
+    id: 'users',
+    name: 'Usuários',
+    icon: 'Users',
+    description: 'Gerenciamento de usuários do sistema',
+    group: 'core',
+    fields: [
+      { id: 'name', name: 'Nome', type: 'text', required: true, placeholder: 'Digite o nome completo' },
+      { id: 'email', name: 'Email', type: 'email', required: true, placeholder: 'Digite o email' },
+      { id: 'phone', name: 'Telefone', type: 'text', placeholder: 'Digite o telefone' },
+      { id: 'role', name: 'Função', type: 'select', required: true, options: ['Admin', 'User', 'Manager'] },
+      { id: 'active', name: 'Ativo', type: 'boolean' }
+    ],
+    relationships: [
+      { id: 'user-profile', name: 'Perfil', targetModule: 'profiles', type: 'one-to-one' }
+    ]
+  },
+  products: {
+    id: 'products',
+    name: 'Produtos',
+    icon: 'Package',
+    description: 'Catálogo de produtos',
+    group: 'inventory',
+    fields: [
+      { id: 'name', name: 'Nome', type: 'text', required: true, placeholder: 'Nome do produto' },
+      { id: 'description', name: 'Descrição', type: 'textarea', placeholder: 'Descrição detalhada' },
+      { id: 'price', name: 'Preço', type: 'number', required: true, placeholder: '0.00' },
+      { id: 'category', name: 'Categoria', type: 'select', options: ['Eletrônicos', 'Roupas', 'Casa', 'Esportes'] },
+      { id: 'available', name: 'Disponível', type: 'boolean' }
+    ]
+  },
+  customers: {
+    id: 'customers',
+    name: 'Clientes',
+    icon: 'UserCheck',
+    description: 'Base de clientes',
+    group: 'crm',
+    fields: [
+      { id: 'name', name: 'Nome', type: 'text', required: true, placeholder: 'Nome do cliente' },
+      { id: 'email', name: 'Email', type: 'email', required: true, placeholder: 'Email do cliente' },
+      { id: 'company', name: 'Empresa', type: 'text', placeholder: 'Nome da empresa' },
+      { id: 'phone', name: 'Telefone', type: 'text', placeholder: 'Telefone de contato' },
+      { id: 'status', name: 'Status', type: 'select', options: ['Ativo', 'Inativo', 'Prospect'] }
+    ]
   }
+}
 
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                <Home className="h-4 w-4" />
-                Dashboard
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-gray-400 dark:text-gray-500" />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/cadastros" className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                <Database className="h-4 w-4" />
-                Cadastros
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="text-gray-400 dark:text-gray-500" />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="text-gray-900 dark:text-gray-100">{moduleData.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <ThemeToggle />
-      </div>
+const cadastroGroups: Record<string, CadastroGroup> = {
+  core: {
+    id: 'core',
+    name: 'Sistema',
+    description: 'Módulos principais do sistema',
+    modules: ['users']
+  },
+  inventory: {
+    id: 'inventory',
+    name: 'Estoque',
+    description: 'Gestão de produtos e estoque',
+    modules: ['products']
+  },
+  crm: {
+    id: 'crm',
+    name: 'CRM',
+    description: 'Gestão de relacionamento com clientes',
+    modules: ['customers']
+  }
+}
 
-      {/* Module Content */}
-      <CadastroModule
-        moduleId={moduleData.id}
-        moduleName={moduleData.name}
-        moduleIcon={moduleData.icon}
-        moduleDescription={moduleData.description}
-        fields={moduleData.fields}
-        relationships={moduleData.relationships}
-      />
-    </div>
-  )
+// Utility functions
+export function getAllCadastroModules(): Record<string, CadastroModule> {
+  return cadastroModules
+}
+
+export function getCadastroModule(moduleId: string): CadastroModule | null {
+  return cadastroModules[moduleId] || null
+}
+
+export function getCadastroGroups(): Record<string, CadastroGroup> {
+  return cadastroGroups
+}
+
+export function getCadastroModulesByGroup(groupId: string): CadastroModule[] {
+  const group = cadastroGroups[groupId]
+  if (!group) return []
+  
+  return group.modules
+    .map(moduleId => cadastroModules[moduleId])
+    .filter(Boolean)
 }
