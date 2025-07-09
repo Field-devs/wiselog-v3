@@ -1,3 +1,4 @@
+"use client";
 import { UnifiedCadastroHeader } from "@/components/unified-cadastro-header"
 import { useState, useEffect } from "react"
 import { getAllCadastroModules, getCadastroGroups } from "@/lib/cadastro-modules"
